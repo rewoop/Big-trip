@@ -245,19 +245,30 @@ const createNewEventTemplate = () => {
           </div>
         </section>
       </section>
-    </form>
-    <ul class="trip-days">
-      <li class="trip-days__item  day">
-        <div class="day__info">
-          <span class="day__counter">1</span>
-          <time class="day__date" datetime="2019-03-18">MAR 18</time>
-        </div>
+    </form>`
+  );
+};
 
-        <ul class="trip-events__list"></ul></li>`
+const createTripListTemplate = () => {
+  return (
+    `<ul class="trip-days"></ul>`
   );
 };
 
 const createTripDaysTemplate = () => {
+  return (
+    `<li class="trip-days__item  day">
+      <div class="day__info">
+        <span class="day__counter">1</span>
+        <time class="day__date" datetime="2019-03-18">MAR 18</time>
+      </div>
+
+      <ul class="trip-events__list"></ul>
+     </li>`
+  );
+};
+
+const createTripEventsTemplate = () => {
   return (
     `<li class="trip-events__item">
         <div class="event">
@@ -311,9 +322,14 @@ render(siteNavigationMenuHeader, createMenuTemplate(), `afterend`);
 render(siteNavigationMenu, createFilterTemplate());
 render(siteTripEvents, createSortTemplate());
 render(siteTripEvents, createNewEventTemplate());
+render(siteTripEvents, createTripListTemplate());
 
-const siteTripDaysList = siteMainElement.querySelector(`.trip-events__list`);
+const siteTripDaysList = siteMainElement.querySelector(`.trip-days`);
+
+render(siteTripDaysList, createTripDaysTemplate());
+
+const siteTripEventsList = siteMainElement.querySelector(`.trip-events__list`);
 
 for (let i = 0; i < TRIP_DAYS_COUNT; i++) {
-  render(siteTripDaysList, createTripDaysTemplate());
+  render(siteTripEventsList, createTripEventsTemplate());
 }
