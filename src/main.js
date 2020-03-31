@@ -301,23 +301,23 @@ const createTripDaysTemplate = () => {
   );
 };
 
-const siteHeaderElement = document.querySelector('.trip-main');
+const siteHeaderElement = document.querySelector(`.trip-main`);
 const siteMainElement = document.querySelector(`.page-main`);
-const siteNavigationMenu = siteHeaderElement.querySelector('.trip-controls');
-const siteTripEvents = siteMainElement.querySelector('.trip-events');
+const siteNavigationMenu = siteHeaderElement.querySelector(`.trip-controls`);
+const siteTripEvents = siteMainElement.querySelector(`.trip-events`);
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
 };
 
-render(siteHeaderElement, createTripInfoTemplate(), 'beforeend');
-render(siteNavigationMenu, createMenuTemplate(), 'beforeend');
-render(siteNavigationMenu, createFilterTemplate(), 'beforeend');
-render(siteTripEvents, createSortTemplate(), 'beforeend');
-render(siteTripEvents, createNewEventTemplate(), 'beforeend');
+render(siteHeaderElement, createTripInfoTemplate(), `beforeend`);
+render(siteNavigationMenu, createMenuTemplate(), `beforeend`);
+render(siteNavigationMenu, createFilterTemplate(), `beforeend`);
+render(siteTripEvents, createSortTemplate(), `beforeend`);
+render(siteTripEvents, createNewEventTemplate(), `beforeend`);
 
-const siteTripDaysList = siteMainElement.querySelector('.trip-events__list');
+const siteTripDaysList = siteMainElement.querySelector(`.trip-events__list`);
 
 for (let i = 0; i < TRIP_DAYS_COUNT; i++) {
-  render(siteTripDaysList, createTripDaysTemplate(), 'beforeend');
-};
+  render(siteTripDaysList, createTripDaysTemplate(), `beforeend`);
+}
