@@ -1,12 +1,12 @@
-import {eventTypesMap, MAX_ISO_STRING_LENGTH} from "../const";
-import {castTimeFormat} from "../utils";
+import {EventSuffix, MAX_ISO_STRING_LENGTH, DEFAULT_EXTRA_HOURS, DEFAULT_EXTRA_DAYS} from "../const";
+import {castTimeFormat, getOffers, checkSuffix} from "../utils";
 
 const createEventMarkup = (tripEvent) => {
-  const {type, city, time, price, offers} = tripEvent;
-  const {eventStartTime, duration, eventEndTime} = time;
+  const {type, city, time, price} = tripEvent;
+  const {eventStartTime, eventEndTime} = time;
 
   const getSelectedOffers = () => {
-    return offers.map((offer) => {
+    return getOffers(type).map((offer) => {
       return (`<li class="event__offer">
         <span class="event__offer-title">${offer.title}</span>
         &plus;
@@ -16,15 +16,20 @@ const createEventMarkup = (tripEvent) => {
   };
 
   const getDurationTime = () => {
-    if (duration.days > 0) {
-      if (duration.hours > 0) {
-        return `<p class="event__duration">${duration.days}D ${duration.hours}H ${duration.minutes}M</p>`;
+    const duration = new Date(eventEndTime - eventStartTime);
+    const durationMinutes = duration.getMinutes();
+    const durationHours = duration.getHours() - DEFAULT_EXTRA_HOURS;
+    const durationDays = duration.getDate() - DEFAULT_EXTRA_DAYS;
+
+    if (durationDays > 0) {
+      if (durationHours > 0) {
+        return `${durationDays}D ${durationHours}H ${durationMinutes}M`;
       }
-      return `<p class="event__duration">${duration.days}D 0H ${duration.minutes}M</p>`;
-    } else if (duration.hours > 0) {
-      return `<p class="event__duration">${duration.hours}H ${duration.minutes}M</p>`;
+      return `${durationDays}D 0H ${durationMinutes}M`;
+    } else if (durationHours > 0) {
+      return `${durationHours}H ${durationMinutes}M`;
     }
-    return `<p class="event__duration">${duration.minutes}M</p>`;
+    return `${durationMinutes}M`;
   };
 
   const eventTimeMarkup = () => {
@@ -42,7 +47,7 @@ const createEventMarkup = (tripEvent) => {
         &mdash;
         <time class="event__end-time" datetime="${endISOString}">${endTimeHours}:${endTimeMinutes}</time>
       </p>
-       ${getDurationTime()}`
+       <p class="event__duration">${getDurationTime()}</p>`
     );
   };
 
@@ -51,7 +56,7 @@ const createEventMarkup = (tripEvent) => {
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${eventTypesMap[type] + city}</h3>
+      <h3 class="event__title">${type} ${EventSuffix[checkSuffix(type)] + city}</h3>
 
       <div class="event__schedule">
       ${eventTimeMarkup()}

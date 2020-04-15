@@ -1,7 +1,24 @@
 import {getRandomItem, getRandomIntegerNumber, shuffleItems} from "../utils";
-import {EVENT_TYPES, CITIES, offers, CURRENT_YEAR, MIN_MONTH, MAX_MONTH, MIN_DAY, MAX_SUMM_DAY, MAX_DAY, MIN_HOURS, MAX_HOURS, MIN_MINUTES, MIN_SUMM_MINUTES, MAX_MINUTES, MIN_EVENT_PRICE, MAX_EVENT_PRICE, DEFAULT_EXTRA_HOURS, DEFAULT_EXTRA_DAYS, MAX_OFFERS_COUNT} from "../const";
+import {
+  EVENT_TYPES,
+  CITIES,
+  CURRENT_YEAR,
+  MIN_MONTH,
+  MAX_MONTH,
+  MIN_DAY,
+  MAX_SUMM_DAY,
+  MAX_DAY,
+  MIN_HOURS,
+  MAX_HOURS,
+  MIN_MINUTES,
+  MIN_SUMM_MINUTES,
+  MAX_MINUTES,
+  MIN_EVENT_PRICE,
+  MAX_EVENT_PRICE,
+  DESCRIPTION_SENTENCES, MIN_COUNT_DESCRIPTION, MAX_COUNT_DESCRIPTION
+} from "../const";
 
-const eventTime = () => {
+const getEventTime = () => {
   const startTime = new Date(CURRENT_YEAR, getRandomIntegerNumber(MIN_MONTH, MAX_MONTH), getRandomIntegerNumber(MIN_DAY, MAX_DAY), getRandomIntegerNumber(MIN_HOURS, MAX_HOURS), getRandomIntegerNumber(MIN_MINUTES, MAX_MINUTES));
   const endTime = new Date();
 
@@ -10,33 +27,48 @@ const eventTime = () => {
   endTime.setHours(startTime.getHours() + getRandomIntegerNumber(MIN_HOURS, MAX_HOURS));
   endTime.setMinutes(startTime.getMinutes() + getRandomIntegerNumber(MIN_SUMM_MINUTES, MAX_MINUTES));
 
-  const durationTime = () => {
-    const duration = new Date(endTime - startTime);
-    return {
-      minutes: duration.getMinutes(),
-      hours: duration.getHours() - DEFAULT_EXTRA_HOURS,
-      days: duration.getDate() - DEFAULT_EXTRA_DAYS
-    };
-  };
-
   return {
     eventStartTime: startTime,
-    duration: durationTime(),
     eventEndTime: endTime
   };
 };
 
-const getRandomOffers = () => {
-  return shuffleItems(offers).slice().splice(0, getRandomIntegerNumber(0, MAX_OFFERS_COUNT));
+const getNewEventForm = () => {
+  const getNewDescription = () => {
+    return shuffleItems(DESCRIPTION_SENTENCES).slice().splice(0, getRandomIntegerNumber(MIN_COUNT_DESCRIPTION, MAX_COUNT_DESCRIPTION));
+  };
+
+  const getNewPhotos = () => {
+    const photos = [];
+    for (let i = 0; i < getRandomIntegerNumber(MIN_COUNT_DESCRIPTION, MAX_COUNT_DESCRIPTION); i++) {
+      photos.push(`http://picsum.photos/248/152?r=${Math.random()}`);
+    }
+    return photos;
+  };
+
+  const getCurrentEventType = () => {
+    const currentType = getRandomItem(EVENT_TYPES);
+
+    return {
+      icon: currentType.toLowerCase(),
+      label: currentType
+    };
+  };
+
+  return {
+    description: getNewDescription(),
+    photos: getNewPhotos(),
+    currentEventType: getCurrentEventType()
+  };
 };
 
 const generateTripEvent = () => {
   return {
     type: getRandomItem(EVENT_TYPES),
     city: getRandomItem(CITIES),
-    time: eventTime(),
+    time: getEventTime(),
     price: getRandomIntegerNumber(MIN_EVENT_PRICE, MAX_EVENT_PRICE),
-    offers: getRandomOffers(),
+    newEventForm: getNewEventForm()
   };
 };
 
@@ -46,4 +78,4 @@ const generateTripEvents = (count) => {
     .map(generateTripEvent);
 };
 
-export {generateTripEvents, getRandomOffers};
+export {generateTripEvents};
