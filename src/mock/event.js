@@ -15,7 +15,7 @@ import {
   MAX_MINUTES,
   MIN_EVENT_PRICE,
   MAX_EVENT_PRICE,
-  DESCRIPTION_SENTENCES, MIN_COUNT_DESCRIPTION, MAX_COUNT_DESCRIPTION
+  DESCRIPTION_SENTENCES, MIN_COUNT_DESCRIPTION, MAX_COUNT_DESCRIPTION, EventTypeOffers,
 } from "../const";
 
 const getEventTime = () => {
@@ -35,7 +35,7 @@ const getEventTime = () => {
 
 const getNewEventForm = () => {
   const getNewDescription = () => {
-    return shuffleItems(DESCRIPTION_SENTENCES).slice().splice(0, getRandomIntegerNumber(MIN_COUNT_DESCRIPTION, MAX_COUNT_DESCRIPTION));
+    return shuffleItems(DESCRIPTION_SENTENCES).slice().splice(0, getRandomIntegerNumber(MIN_COUNT_DESCRIPTION, MAX_COUNT_DESCRIPTION)).join(`\n`);
   };
 
   const getNewPhotos = () => {
@@ -46,29 +46,30 @@ const getNewEventForm = () => {
     return photos;
   };
 
-  const getCurrentEventType = () => {
-    const currentType = getRandomItem(EVENT_TYPES);
-
-    return {
-      icon: currentType.toLowerCase(),
-      label: currentType
-    };
-  };
-
   return {
     description: getNewDescription(),
     photos: getNewPhotos(),
-    currentEventType: getCurrentEventType()
+    currentCity: getRandomItem(CITIES)
   };
 };
 
 const generateTripEvent = () => {
+  const currentType = getRandomItem(EVENT_TYPES);
+  const getCurrentEventType = (type) => {
+    return {
+      icon: type.toLowerCase(),
+      label: type
+    };
+  };
+
   return {
-    type: getRandomItem(EVENT_TYPES),
+    type: currentType,
     city: getRandomItem(CITIES),
     time: getEventTime(),
     price: getRandomIntegerNumber(MIN_EVENT_PRICE, MAX_EVENT_PRICE),
-    newEventForm: getNewEventForm()
+    offers: EventTypeOffers[currentType].slice(),
+    newEventForm: getNewEventForm(),
+    newEventType: getCurrentEventType(currentType)
   };
 };
 

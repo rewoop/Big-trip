@@ -1,17 +1,21 @@
-import {EventSuffix, MAX_ISO_STRING_LENGTH, DEFAULT_EXTRA_HOURS, DEFAULT_EXTRA_DAYS} from "../const";
-import {castTimeFormat, getOffers, checkSuffix} from "../utils";
+import {EventSuffix, MAX_ISO_STRING_LENGTH, DEFAULT_EXTRA_HOURS, DEFAULT_EXTRA_DAYS, MAX_SHOWING_OFFERS} from "../const";
+import {castTimeFormat, checkSuffix} from "../utils";
 
 const createEventMarkup = (tripEvent) => {
-  const {type, city, time, price} = tripEvent;
+  const {type, city, time, price, offers} = tripEvent;
   const {eventStartTime, eventEndTime} = time;
 
   const getSelectedOffers = () => {
-    return getOffers(type).map((offer) => {
-      return (`<li class="event__offer">
-        <span class="event__offer-title">${offer.title}</span>
-        &plus;
-        &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
-       </li>`);
+    return offers.slice(0, MAX_SHOWING_OFFERS).map((offer) => {
+      if (offer.required) {
+        return (`<li class="event__offer">
+          <span class="event__offer-title">${offer.title}</span>
+          &plus;
+          &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
+         </li>`);
+      } else {
+        return ``;
+      }
     }).join(`\n`);
   };
 

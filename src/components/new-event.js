@@ -1,18 +1,14 @@
 import {
-  getRandomItem,
-  getRandomIntegerNumber,
-  getRandomBoolean,
   castTimeFormat,
-  getOffers,
   checkSuffix,
 } from "../utils";
-import {CITIES, TRANSFER_EVENTS, ACTIVITY_EVENTS, MIN_EVENT_PRICE, MAX_EVENT_PRICE, EVENT_TYPES, EventSuffix} from "../const";
+import {CITIES, TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix} from "../const";
 
 const createNewEventTemplate = (newEvent) => {
-  const {time, newEventForm} = newEvent;
-  const {description, photos, currentEventType} = newEventForm;
+  const {time, offers, price, newEventForm, newEventType} = newEvent;
+  const {description, photos, currentCity} = newEventForm;
   const {eventStartTime, eventEndTime} = time;
-  const {icon, label} = currentEventType;
+  const {icon, label} = newEventType;
 
   const renderPhotosMarkup = () => {
     return photos.map((photo) => {
@@ -27,31 +23,29 @@ const createNewEventTemplate = (newEvent) => {
     </div>`;
   };
 
-  const renderEventTypesGroupMarkup = (isTransfer) => {
-    if (isTransfer) {
-      return EVENT_TYPES.slice(0, TRANSFER_EVENTS).map((type) => {
-        return getTypesMarkup(type);
-      }).join(`\n`);
-    } else {
-      return EVENT_TYPES.slice(TRANSFER_EVENTS, ACTIVITY_EVENTS).map((type) => {
-        return getTypesMarkup(type);
-      }).join(`\n`);
-    }
+  const renderEventTypesGroupMarkup = (start, end) => {
+    return EVENT_TYPES.slice(start, end).map((type) => {
+      return getTypesMarkup(type);
+    }).join(`\n`);
   };
 
   const renderDestinationsMarkup = () => {
-    return CITIES.slice().map((city) => {
+    return CITIES.map((city) => {
       return (
         `<option value="${city}"></option>`
       );
     }).join(`\n`);
   };
 
+  const renderTimeFormat = (currentEventTime) => {
+    return `${castTimeFormat(currentEventTime.getDate())}/${castTimeFormat(currentEventTime.getMonth())}/${String(currentEventTime.getFullYear()).slice(2)} ${castTimeFormat(currentEventTime.getHours())}:${castTimeFormat(currentEventTime.getMinutes())}`;
+  };
+
   const generateOffers = () => {
-    return getOffers(label).map((offer) => {
+    return offers.map((offer) => {
       return (
         `<div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}-1" type="checkbox" name="event-offer-${offer.id}" ${getRandomBoolean() ? `checked` : ``}>
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}-1" type="checkbox" name="event-offer-${offer.id}" ${offer.required ? `checked` : ``}>
           <label class="event__offer-label" for="event-offer-${offer.id}-1">
             <span class="event__offer-title">${offer.title}</span>
             &plus;
@@ -75,12 +69,12 @@ const createNewEventTemplate = (newEvent) => {
                 <div class="event__type-list">
                   <fieldset class="event__type-group">
                     <legend class="visually-hidden">Transfer</legend>
-                    ${renderEventTypesGroupMarkup(true)}
+                    ${renderEventTypesGroupMarkup(0, TRANSFER_EVENTS)}
                   </fieldset>
 
                   <fieldset class="event__type-group">
                     <legend class="visually-hidden">Activity</legend>
-                    ${renderEventTypesGroupMarkup(false)}
+                    ${renderEventTypesGroupMarkup(TRANSFER_EVENTS, ACTIVITY_EVENTS)}
                   </fieldset>
                 </div>
               </div>
@@ -89,7 +83,7 @@ const createNewEventTemplate = (newEvent) => {
                 <label class="event__label  event__type-output" for="event-destination-1">
                   ${label} ${EventSuffix[checkSuffix(label)]}
                 </label>
-                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${getRandomItem(CITIES)}" list="destination-list-1">
+                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${currentCity}" list="destination-list-1">
                 <datalist id="destination-list-1">
                   ${renderDestinationsMarkup()}
                 </datalist>
@@ -99,12 +93,12 @@ const createNewEventTemplate = (newEvent) => {
                 <label class="visually-hidden" for="event-start-time-1">
                   From
                 </label>
-                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${castTimeFormat(eventStartTime.getDate())}/${castTimeFormat(eventStartTime.getMonth())}/${String(eventStartTime.getFullYear()).slice(2)} ${castTimeFormat(eventStartTime.getHours())}:${castTimeFormat(eventStartTime.getMinutes())}">
+                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${renderTimeFormat(eventStartTime)}">
                 &mdash;
                 <label class="visually-hidden" for="event-end-time-1">
                   To
                 </label>
-                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${castTimeFormat(eventEndTime.getDate())}/${castTimeFormat(eventEndTime.getMonth())}/${String(eventEndTime.getFullYear()).slice(2)} ${castTimeFormat(eventEndTime.getHours())}:${castTimeFormat(eventEndTime.getMinutes())}">
+                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${renderTimeFormat(eventEndTime)}">
               </div>
 
               <div class="event__field-group  event__field-group--price">
@@ -112,7 +106,7 @@ const createNewEventTemplate = (newEvent) => {
                   <span class="visually-hidden">Price</span>
                   &euro;
                 </label>
-                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${getRandomIntegerNumber(MIN_EVENT_PRICE, MAX_EVENT_PRICE)}">
+                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
               </div>
 
               <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -129,7 +123,7 @@ const createNewEventTemplate = (newEvent) => {
 
               <section class="event__section  event__section--destination">
                 <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                <p class="event__destination-description">${description.join(`\n`)}</p>
+                <p class="event__destination-description">${description}</p>
 
                 <div class="event__photos-container">
                   <div class="event__photos-tape">

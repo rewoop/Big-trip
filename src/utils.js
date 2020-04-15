@@ -1,8 +1,8 @@
-import {EventTypeOffers} from "./const";
+// import {EventTypeOffers} from "./const";
 
-const HALF_OF_RANDOM = 0.5;
+// const HALF_OF_RANDOM = 0.5;
+// const MAX_OFFERS_COUNT = 3;
 const MIN_TWO_DIGIT_NUMBER = 10;
-const MAX_OFFERS_COUNT = 3;
 
 const getRandomItem = (items) => {
   const randomIndex = getRandomIntegerNumber(0, items.length);
@@ -14,7 +14,7 @@ const getRandomIntegerNumber = (min, max) => {
   return min + Math.floor(Math.random() * (max - min));
 };
 
-const getRandomBoolean = () => Math.random() > HALF_OF_RANDOM;
+// const getRandomBoolean = () => Math.random() > HALF_OF_RANDOM;
 
 const castTimeFormat = (value) => {
   return value < MIN_TWO_DIGIT_NUMBER ? `0${value}` : String(value);
@@ -28,17 +28,14 @@ const shuffleItems = (items) => {
   return items;
 };
 
-const getOffers = (type) => {
-  const currentTypeOffers = EventTypeOffers[type].slice();
-  return currentTypeOffers.splice(0, getRandomIntegerNumber(0, MAX_OFFERS_COUNT));
-};
+// const getOffers = (type) => {
+//   const currentTypeOffers = EventTypeOffers[type].slice();
+//   return currentTypeOffers.splice(0, getRandomIntegerNumber(0, MAX_OFFERS_COUNT));
+// };
 
 const checkSuffix = (label) => {
-  let modernLabel = label.toUpperCase();
-  if (modernLabel === `CHECK-IN`) {
-    return `CHECK_IN`;
-  }
-  return modernLabel;
+  const modernLabel = label.toUpperCase();
+  return modernLabel === `CHECK-IN` ? `CHECK_IN` : modernLabel;
 };
 
-export {getRandomItem, getRandomIntegerNumber, castTimeFormat, shuffleItems, getRandomBoolean, getOffers, checkSuffix};
+export {getRandomItem, getRandomIntegerNumber, castTimeFormat, shuffleItems, checkSuffix};
