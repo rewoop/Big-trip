@@ -29,7 +29,7 @@ const render = (container, template, place = `beforeend`) => {
 // };
 
 const reduceEventItems = tripEvents.reduce((days, item) => {
-  const time = item.time.eventStartTime.toJSON().slice(8, 10);
+  const time = item.time.eventStartTime.toJSON().slice(5, 10);
   days[time] = days[time] || [];
   days[time].push(item);
   return days;
@@ -38,9 +38,9 @@ const reduceEventItems = tripEvents.reduce((days, item) => {
 const groupEventItems = Object.keys(reduceEventItems).map((day) => {
   return {
     day,
-    item: reduceEventItems[day]
+    items: reduceEventItems[day]
   };
-}).sort((a, b) => a.day - b.day);
+}).sort((a, b) => a.day > b.day ? 1 : -1);
 
 //   .reduce((month, item) => {
 //     month[item.currentMonth] = month[item.currentMonth] || [];
@@ -56,8 +56,8 @@ const groupEventItems = Object.keys(reduceEventItems).map((day) => {
 // }).sort((a, b) => a.day - b.day);
 
 const createCurrentTripDays = () => {
-  return groupEventItems.map((item, index) => {
-    return createTripDaysTemplate(item, index);
+  return groupEventItems.map((items, index) => {
+    return createTripDaysTemplate(items, index);
   }).join(`\n`);
 };
 

@@ -1,21 +1,24 @@
-import {getRandomItem, getRandomIntegerNumber, shuffleItems} from "../utils";
+import {getRandomBoolean, getRandomIntegerNumber, getRandomItem, shuffleItems} from "../utils";
 import {
-  EVENT_TYPES,
   CITIES,
   CURRENT_YEAR,
-  MIN_MONTH,
-  MAX_MONTH,
-  MIN_DAY,
-  MAX_SUMM_DAY,
+  DESCRIPTION_SENTENCES,
+  EVENT_TYPES,
+  EventTypeOffers,
+  MAX_COUNT_DESCRIPTION,
   MAX_DAY,
-  MIN_HOURS,
-  MAX_HOURS,
-  MIN_MINUTES,
-  MIN_SUMM_MINUTES,
-  MAX_MINUTES,
-  MIN_EVENT_PRICE,
   MAX_EVENT_PRICE,
-  DESCRIPTION_SENTENCES, MIN_COUNT_DESCRIPTION, MAX_COUNT_DESCRIPTION, EventTypeOffers,
+  MAX_HOURS,
+  MAX_MINUTES,
+  MAX_MONTH,
+  MAX_SUMM_DAY,
+  MIN_COUNT_DESCRIPTION,
+  MIN_DAY,
+  MIN_EVENT_PRICE,
+  MIN_HOURS,
+  MIN_MINUTES,
+  MIN_MONTH,
+  MIN_SUMM_MINUTES,
 } from "../const";
 
 const getEventTime = () => {
@@ -33,7 +36,7 @@ const getEventTime = () => {
   };
 };
 
-const getNewEventForm = () => {
+const getNewEventForm = (city) => {
   const getNewDescription = () => {
     return shuffleItems(DESCRIPTION_SENTENCES).slice().splice(0, getRandomIntegerNumber(MIN_COUNT_DESCRIPTION, MAX_COUNT_DESCRIPTION)).join(`\n`);
   };
@@ -49,12 +52,13 @@ const getNewEventForm = () => {
   return {
     description: getNewDescription(),
     photos: getNewPhotos(),
-    currentCity: getRandomItem(CITIES)
+    currentCity: city
   };
 };
 
 const generateTripEvent = () => {
   const currentType = getRandomItem(EVENT_TYPES);
+  const currentCity = getRandomItem(CITIES);
   const getCurrentEventType = (type) => {
     return {
       icon: type.toLowerCase(),
@@ -62,13 +66,20 @@ const generateTripEvent = () => {
     };
   };
 
+  const getCurrentOffers = () => {
+    return EventTypeOffers[currentType].map((offer) => {
+      offer.required = getRandomBoolean();
+      return offer;
+    });
+  };
+
   return {
     type: currentType,
-    city: getRandomItem(CITIES),
+    city: currentCity,
     time: getEventTime(),
     price: getRandomIntegerNumber(MIN_EVENT_PRICE, MAX_EVENT_PRICE),
-    offers: EventTypeOffers[currentType].slice(),
-    newEventForm: getNewEventForm(),
+    offers: getCurrentOffers(),
+    newEventForm: getNewEventForm(currentCity),
     newEventType: getCurrentEventType(currentType)
   };
 };

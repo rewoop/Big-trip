@@ -6,16 +6,12 @@ const createEventMarkup = (tripEvent) => {
   const {eventStartTime, eventEndTime} = time;
 
   const getSelectedOffers = () => {
-    return offers.slice(0, MAX_SHOWING_OFFERS).map((offer) => {
-      if (offer.required) {
-        return (`<li class="event__offer">
-          <span class="event__offer-title">${offer.title}</span>
-          &plus;
-          &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
-         </li>`);
-      } else {
-        return ``;
-      }
+    return offers.filter((offer) => offer.required).slice(0, MAX_SHOWING_OFFERS).map((offer) => {
+      return `<li class="event__offer">
+        <span class="event__offer-title">${offer.title}</span>
+        &plus;
+        &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
+       </li>`;
     }).join(`\n`);
   };
 

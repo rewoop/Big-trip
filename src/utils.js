@@ -1,6 +1,6 @@
 // import {EventTypeOffers} from "./const";
 
-// const HALF_OF_RANDOM = 0.5;
+const HALF_OF_RANDOM = 0.5;
 // const MAX_OFFERS_COUNT = 3;
 const MIN_TWO_DIGIT_NUMBER = 10;
 
@@ -14,7 +14,7 @@ const getRandomIntegerNumber = (min, max) => {
   return min + Math.floor(Math.random() * (max - min));
 };
 
-// const getRandomBoolean = () => Math.random() > HALF_OF_RANDOM;
+const getRandomBoolean = () => Math.random() > HALF_OF_RANDOM;
 
 const castTimeFormat = (value) => {
   return value < MIN_TWO_DIGIT_NUMBER ? `0${value}` : String(value);
@@ -38,4 +38,4 @@ const checkSuffix = (label) => {
   return modernLabel === `CHECK-IN` ? `CHECK_IN` : modernLabel;
 };
 
-export {getRandomItem, getRandomIntegerNumber, castTimeFormat, shuffleItems, checkSuffix};
+export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, castTimeFormat, shuffleItems, checkSuffix};
