@@ -58,24 +58,25 @@ const getDestinationInfo = () => {
   });
 };
 
+const destinations = getDestinationInfo();
+
 const generateTripEvent = () => {
   const currentType = getRandomItem(EVENT_TYPES);
-  const destination = getDestinationInfo();
 
   const getCurrentOffers = () => {
     return EventTypeOffers[currentType].map((offer) => {
-      offer.required = getRandomBoolean();
-      return offer;
+      const offerCopy = Object.assign({}, offer);
+      offerCopy.required = getRandomBoolean();
+      return offerCopy;
     });
   };
 
   return {
     type: currentType,
-    city: getRandomItem(CITIES),
     time: getEventTime(),
     price: getRandomIntegerNumber(MIN_EVENT_PRICE, MAX_EVENT_PRICE),
     offers: getCurrentOffers(),
-    destination: destination[getRandomIntegerNumber(0, CITIES.length)]
+    destination: destinations[getRandomIntegerNumber(0, CITIES.length)]
   };
 };
 
