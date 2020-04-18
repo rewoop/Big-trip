@@ -6,7 +6,6 @@ import {createNewEventTemplate} from "./components/new-event";
 import {createTripListTemplate} from "./components/trip-list";
 import {createTripDaysTemplate} from "./components/trip-days";
 import {generateTripEvents} from "./mock/event";
-// import {createTripEventsTemplate} from "./components/trip-events";
 
 
 const TRIP_DAYS_COUNT = 22;
@@ -22,12 +21,6 @@ const render = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
 };
 
-// const createCurrentTripEvents = () => {
-//   return tripEvents.map((it) => {
-//     return createTripEventsTemplate(it);
-//   }).join(`\n`);
-// };
-
 const reduceEventItems = tripEvents.reduce((days, item) => {
   const time = item.time.eventStartTime.toJSON().slice(5, 10);
   days[time] = days[time] || [];
@@ -41,19 +34,6 @@ const groupEventItems = Object.keys(reduceEventItems).map((day) => {
     items: reduceEventItems[day]
   };
 }).sort((a, b) => a.day > b.day ? 1 : -1);
-
-//   .reduce((month, item) => {
-//     month[item.currentMonth] = month[item.currentMonth] || [];
-//     month[item.currentMonth].push(item);
-//     return month;
-//   }, {});
-//
-// const groupEventDaysByMonth = Object.keys(groupEventItems).map((day) => {
-//   return {
-//     day,
-//     item: groupEventItems[day]
-//   };
-// }).sort((a, b) => a.day - b.day);
 
 const createCurrentTripDays = () => {
   return groupEventItems.map((items, index) => {
@@ -71,7 +51,3 @@ render(siteTripEvents, createTripListTemplate());
 const siteTripDaysList = siteMainElement.querySelector(`.trip-days`);
 
 render(siteTripDaysList, createCurrentTripDays());
-
-// const siteTripEventsList = siteMainElement.querySelector(`.trip-events__list`);
-//
-// render(siteTripEventsList, createCurrentTripEvents());

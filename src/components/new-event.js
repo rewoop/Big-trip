@@ -5,10 +5,9 @@ import {
 import {CITIES, TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix} from "../const";
 
 const createNewEventTemplate = (newEvent) => {
-  const {time, offers, price, newEventForm, newEventType} = newEvent;
-  const {description, photos, currentCity} = newEventForm;
+  const {type, time, offers, price, destination} = newEvent;
+  const {description, photos, currentCity} = destination;
   const {eventStartTime, eventEndTime} = time;
-  const {icon, label} = newEventType;
 
   const renderPhotosMarkup = () => {
     return photos.map((photo) => {
@@ -16,16 +15,16 @@ const createNewEventTemplate = (newEvent) => {
     }).join(`\n`);
   };
 
-  const getTypesMarkup = (type) => {
+  const getTypesMarkup = (eventType) => {
     return `<div class="event__type-item">
-      <input id="event-type-${type.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.toLowerCase()}">
-      <label class="event__type-label  event__type-label--${type.toLowerCase()}" for="event-type-${type.toLowerCase()}-1">${type}</label>
+      <input id="event-type-${eventType.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType.toLowerCase()}">
+      <label class="event__type-label  event__type-label--${eventType.toLowerCase()}" for="event-type-${eventType.toLowerCase()}-1">${eventType}</label>
     </div>`;
   };
 
   const renderEventTypesGroupMarkup = (start, end) => {
-    return EVENT_TYPES.slice(start, end).map((type) => {
-      return getTypesMarkup(type);
+    return EVENT_TYPES.slice(start, end).map((eventType) => {
+      return getTypesMarkup(eventType);
     }).join(`\n`);
   };
 
@@ -74,7 +73,7 @@ const createNewEventTemplate = (newEvent) => {
               <div class="event__type-wrapper">
                 <label class="event__type  event__type-btn" for="event-type-toggle-1">
                   <span class="visually-hidden">Choose event type</span>
-                  <img class="event__type-icon" width="17" height="17" src="img/icons/${icon}.png" alt="Event type icon">
+                  <img class="event__type-icon" width="17" height="17" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
                 </label>
                 <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -93,7 +92,7 @@ const createNewEventTemplate = (newEvent) => {
 
               <div class="event__field-group  event__field-group--destination">
                 <label class="event__label  event__type-output" for="event-destination-1">
-                  ${label} ${EventSuffix[checkSuffix(label)]}
+                  ${type} ${EventSuffix[checkSuffix(type)]}
                 </label>
                 <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${currentCity}" list="destination-list-1">
                 <datalist id="destination-list-1">

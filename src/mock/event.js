@@ -36,7 +36,7 @@ const getEventTime = () => {
   };
 };
 
-const getNewEventForm = (city) => {
+const getDestinationInfo = () => {
   const getNewDescription = () => {
     return shuffleItems(DESCRIPTION_SENTENCES).slice().splice(0, getRandomIntegerNumber(MIN_COUNT_DESCRIPTION, MAX_COUNT_DESCRIPTION)).join(`\n`);
   };
@@ -49,22 +49,18 @@ const getNewEventForm = (city) => {
     return photos;
   };
 
-  return {
-    description: getNewDescription(),
-    photos: getNewPhotos(),
-    currentCity: city
-  };
+  return CITIES.map((city) => {
+    return {
+      description: getNewDescription(),
+      photos: getNewPhotos(),
+      currentCity: city
+    };
+  });
 };
 
 const generateTripEvent = () => {
   const currentType = getRandomItem(EVENT_TYPES);
-  const currentCity = getRandomItem(CITIES);
-  const getCurrentEventType = (type) => {
-    return {
-      icon: type.toLowerCase(),
-      label: type
-    };
-  };
+  const destination = getDestinationInfo();
 
   const getCurrentOffers = () => {
     return EventTypeOffers[currentType].map((offer) => {
@@ -75,12 +71,11 @@ const generateTripEvent = () => {
 
   return {
     type: currentType,
-    city: currentCity,
+    city: getRandomItem(CITIES),
     time: getEventTime(),
     price: getRandomIntegerNumber(MIN_EVENT_PRICE, MAX_EVENT_PRICE),
     offers: getCurrentOffers(),
-    newEventForm: getNewEventForm(currentCity),
-    newEventType: getCurrentEventType(currentType)
+    destination: destination[getRandomIntegerNumber(0, CITIES.length)]
   };
 };
 
