@@ -36,24 +36,43 @@ render(siteHeaderElement, new TripInfo().getElement(), RenderPosition.BEFOREEND)
 render(siteNavigationMenuHeader, new Menu().getElement(), RenderPosition.AFTEREND);
 render(siteNavigationMenu, new Filter().getElement(), RenderPosition.BEFOREEND);
 render(siteTripEvents, new Sort().getElement(), RenderPosition.BEFOREEND);
-render(siteTripEvents, new NewEvent(tripEvents[0]).getElement(), RenderPosition.BEFOREEND);
 render(siteTripEvents, new TripList().getElement(), RenderPosition.BEFOREEND);
 
 const siteTripDaysList = siteMainElement.querySelector(`.trip-days`);
 
-const renderTripDays = () => {
-  const createCurrentTripEvents = (eventsList, container) => {
-    return eventsList.items.forEach((tripEvent) => {
-      const currentEvent = new TripEvents(tripEvent);
-      render(container, currentEvent.getElement(), RenderPosition.BEFOREEND);
-    });
+const renderTripEvents = (eventsList, container) => {
+  const replaceEventToEdit = (form, event) => {
+    container.replaceChild(form, event);
   };
 
+  const replaceEditToEvent = (form, event) => {
+    container.replaceChild(event, form);
+  };
+
+  eventsList.items.forEach((tripEvent) => {
+    const currentEvent = new TripEvents(tripEvent);
+    const eventEditComponent = new NewEvent(tripEvent);
+    render(container, currentEvent.getElement(), RenderPosition.BEFOREEND);
+
+    const eventRollupBtn = currentEvent.getElement().querySelector(`.event__rollup-btn`);
+    eventRollupBtn.addEventListener(`click`, () => {
+      replaceEventToEdit(eventEditComponent.getElement(), currentEvent.getElement());
+    });
+
+    const editForm = eventEditComponent.getElement();
+    editForm.addEventListener(`submit`, (evt) => {
+      evt.preventDefault();
+      replaceEditToEvent(eventEditComponent.getElement(), currentEvent.getElement());
+    });
+  });
+};
+
+const renderTripDays = () => {
   groupEventItems.forEach((items, index) => {
     const tripDay = new TripDays(items, index);
     render(siteTripDaysList, tripDay.getElement(), RenderPosition.BEFOREEND);
     const tripEventsList = tripDay.getElement().querySelector(`.trip-events__list`);
-    createCurrentTripEvents(items, tripEventsList);
+    renderTripEvents(items, tripEventsList);
   });
 };
 
