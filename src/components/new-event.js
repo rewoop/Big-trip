@@ -1,6 +1,7 @@
 import {
   castTimeFormat,
   checkSuffix,
+  createElement
 } from "../utils";
 import {CITIES, TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix} from "../const";
 
@@ -140,4 +141,26 @@ const createNewEventTemplate = (newEvent) => {
   );
 };
 
-export {createNewEventTemplate};
+export default class NewEvent {
+  constructor(event) {
+    this._event = event;
+
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createNewEventTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

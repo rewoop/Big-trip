@@ -1,8 +1,11 @@
-// import {EventTypeOffers} from "./const";
-
 const HALF_OF_RANDOM = 0.5;
-// const MAX_OFFERS_COUNT = 3;
 const MIN_TWO_DIGIT_NUMBER = 10;
+
+const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`,
+  AFTEREND: `afterend`
+};
 
 const getRandomItem = (items) => {
   const randomIndex = getRandomIntegerNumber(0, items.length);
@@ -28,14 +31,30 @@ const shuffleItems = (items) => {
   return items;
 };
 
-// const getOffers = (type) => {
-//   const currentTypeOffers = EventTypeOffers[type].slice();
-//   return currentTypeOffers.splice(0, getRandomIntegerNumber(0, MAX_OFFERS_COUNT));
-// };
-
 const checkSuffix = (label) => {
   const modernLabel = label.toUpperCase();
   return modernLabel === `CHECK-IN` ? `CHECK_IN` : modernLabel;
 };
 
-export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, castTimeFormat, shuffleItems, checkSuffix};
+const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+
+  return newElement.firstElementChild;
+};
+
+const render = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+    case RenderPosition.AFTEREND:
+      container.after(element);
+      break;
+  }
+};
+
+export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, castTimeFormat, shuffleItems, checkSuffix, createElement, render, RenderPosition};
