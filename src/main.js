@@ -1,12 +1,13 @@
-import {createTripInfoTemplate} from "./components/trip-info";
-import {createMenuTemplate} from "./components/menu";
-import {createFilterTemplate} from "./components/filter";
-import {createSortTemplate} from "./components/sort";
-import {createNewEventTemplate} from "./components/new-event";
-import {createTripListTemplate} from "./components/trip-list";
-import {createTripDaysTemplate} from "./components/trip-days";
+import TripInfo from "./components/trip-info";
+import Menu from "./components/menu";
+import Filter from "./components/filter";
+import Sort from "./components/sort";
+import NewEvent from "./components/new-event";
+import TripList from "./components/trip-list";
+import TripDays from "./components/trip-days";
+import TripEvents from "./components/trip-events";
 import {generateTripEvents} from "./mock/event";
-
+import {render, RenderPosition} from "./utils";
 
 const TRIP_DAYS_COUNT = 22;
 const tripEvents = generateTripEvents(TRIP_DAYS_COUNT);
@@ -16,10 +17,6 @@ const siteMainElement = document.querySelector(`.page-main`);
 const siteNavigationMenu = siteHeaderElement.querySelector(`.trip-controls`);
 const siteNavigationMenuHeader = siteNavigationMenu.querySelector(`h2`);
 const siteTripEvents = siteMainElement.querySelector(`.trip-events`);
-
-const render = (container, template, place = `beforeend`) => {
-  container.insertAdjacentHTML(place, template);
-};
 
 const reduceEventItems = tripEvents.reduce((days, item) => {
   const time = item.time.eventStartTime.toJSON().slice(5, 10);
@@ -35,19 +32,50 @@ const groupEventItems = Object.keys(reduceEventItems).map((day) => {
   };
 }).sort((a, b) => a.day > b.day ? 1 : -1);
 
-const createCurrentTripDays = () => {
-  return groupEventItems.map((items, index) => {
-    return createTripDaysTemplate(items, index);
-  }).join(`\n`);
-};
-
-render(siteHeaderElement, createTripInfoTemplate());
-render(siteNavigationMenuHeader, createMenuTemplate(), `afterend`);
-render(siteNavigationMenu, createFilterTemplate());
-render(siteTripEvents, createSortTemplate());
-render(siteTripEvents, createNewEventTemplate(tripEvents[0]));
-render(siteTripEvents, createTripListTemplate());
+render(siteHeaderElement, new TripInfo().getElement(), RenderPosition.BEFOREEND);
+render(siteNavigationMenuHeader, new Menu().getElement(), RenderPosition.AFTEREND);
+render(siteNavigationMenu, new Filter().getElement(), RenderPosition.BEFOREEND);
+render(siteTripEvents, new Sort().getElement(), RenderPosition.BEFOREEND);
+render(siteTripEvents, new TripList().getElement(), RenderPosition.BEFOREEND);
 
 const siteTripDaysList = siteMainElement.querySelector(`.trip-days`);
 
-render(siteTripDaysList, createCurrentTripDays());
+const renderTripEvents = (eventsList, container) => {
+  const replaceEventToEdit = (form, event) => {
+    container.replaceChild(form, event);
+  };
+
+  const replaceEditToEvent = (form, event) => {
+    container.replaceChild(event, form);
+  };
+
+  eventsList.items.forEach((tripEvent) => {
+    const currentEvent = new TripEvents(tripEvent);
+    const eventEditComponent = new NewEvent(tripEvent);
+    render(container, currentEvent.getElement(), RenderPosition.BEFOREEND);
+
+    const eventRollupBtn = currentEvent.getElement().querySelector(`.event__rollup-btn`);
+    eventRollupBtn.addEventListener(`click`, () => {
+      replaceEventToEdit(eventEditComponent.getElement(), currentEvent.getElement());
+    });
+
+    const editForm = eventEditComponent.getElement();
+    editForm.addEventListener(`submit`, (evt) => {
+      evt.preventDefault();
+      replaceEditToEvent(eventEditComponent.getElement(), currentEvent.getElement());
+    });
+  });
+};
+
+const renderTripDays = () => {
+  groupEventItems.forEach((items, index) => {
+    const tripDay = new TripDays(items, index);
+    render(siteTripDaysList, tripDay.getElement(), RenderPosition.BEFOREEND);
+    const tripEventsList = tripDay.getElement().querySelector(`.trip-events__list`);
+    renderTripEvents(items, tripEventsList);
+  });
+};
+
+renderTripDays();
+
+

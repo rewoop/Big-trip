@@ -1,12 +1,6 @@
-import {createTripEventsTemplate} from "./trip-events";
+import {createElement} from "../utils";
 
 const createTripDaysTemplate = (days, index) => {
-  const createCurrentTripEvents = () => {
-    return days.items.map((tripEvent) => {
-      return createTripEventsTemplate(tripEvent);
-    }).join(`\n`);
-  };
-
   const month = days.items[0].time.eventStartTime.toDateString().slice(4, 7).toUpperCase();
   const date = days.items[0].time.eventStartTime.toDateString().slice(8, 10);
   const dateISOString = days.items[0].time.eventStartTime.toISOString().slice(0, 10);
@@ -19,10 +13,31 @@ const createTripDaysTemplate = (days, index) => {
     </div>
 
     <ul class="trip-events__list">
-     ${createCurrentTripEvents()}
     </ul>
    </li>`
   );
 };
 
-export {createTripDaysTemplate};
+export default class TripDays {
+  constructor(days, index) {
+    this._days = days;
+    this._index = index;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripDaysTemplate(this._days, this._index);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
