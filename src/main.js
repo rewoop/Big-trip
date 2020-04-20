@@ -38,30 +38,27 @@ render(siteNavigationMenuHeader, new Menu().getElement(), RenderPosition.AFTEREN
 render(siteNavigationMenu, new Filter().getElement(), RenderPosition.BEFOREEND);
 
 const renderTripEvents = (eventsList, container) => {
-  let currentEvent = ``;
-  let eventEditComponent = ``;
-
-  const replaceEventToEdit = () => {
-    container.replaceChild(eventEditComponent.getElement(), currentEvent.getElement());
-  };
-
-  const replaceEditToEvent = () => {
-    container.replaceChild(currentEvent.getElement(), eventEditComponent.getElement());
-  };
-
-  const onEscKeyDown = (evt) => {
-    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
-
-    if (isEscKey) {
-      replaceEditToEvent();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    }
-  };
-
   eventsList.items.forEach((tripEvent) => {
-    currentEvent = new TripEvents(tripEvent);
-    eventEditComponent = new NewEvent(tripEvent);
+    const currentEvent = new TripEvents(tripEvent);
+    const eventEditComponent = new NewEvent(tripEvent);
     render(container, currentEvent.getElement(), RenderPosition.BEFOREEND);
+
+    const replaceEventToEdit = () => {
+      container.replaceChild(eventEditComponent.getElement(), currentEvent.getElement());
+    };
+
+    const replaceEditToEvent = () => {
+      container.replaceChild(currentEvent.getElement(), eventEditComponent.getElement());
+    };
+
+    const onEscKeyDown = (evt) => {
+      const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+
+      if (isEscKey) {
+        replaceEditToEvent();
+        document.removeEventListener(`keydown`, onEscKeyDown);
+      }
+    };
 
     const eventRollupBtn = currentEvent.getElement().querySelector(`.event__rollup-btn`);
     eventRollupBtn.addEventListener(`click`, () => {
@@ -89,13 +86,14 @@ const renderTripDays = (container, eventDays) => {
   });
 };
 
-const renderTripList = () => {
+const renderTripList = (container) => {
   if (groupEventItems.length > 0) {
-    const tripList = new TripList();
-    render(siteTripEvents, tripList.getElement(), RenderPosition.BEFOREEND);
-    renderTripDays(tripList.getElement(), groupEventItems);
+    renderTripDays(container, groupEventItems);
   } else {
     render(siteTripEvents, new NoTripDays().getElement(), RenderPosition.BEFOREEND);
   }
 };
-renderTripList();
+
+const tripList = new TripList();
+render(siteTripEvents, tripList.getElement(), RenderPosition.BEFOREEND);
+renderTripList(tripList.getElement());
