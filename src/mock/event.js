@@ -1,4 +1,4 @@
-import {getRandomBoolean, getRandomIntegerNumber, getRandomItem, shuffleItems} from "../utils";
+import {getRandomBoolean, getRandomIntegerNumber, getRandomItem, shuffleItems} from "../utils/common";
 import {
   CITIES,
   CURRENT_YEAR,

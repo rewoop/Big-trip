@@ -1,9 +1,9 @@
 import {
   castTimeFormat,
-  checkSuffix,
-  createElement
-} from "../utils";
+  checkSuffix
+} from "../utils/common";
 import {CITIES, TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix} from "../const";
+import AbstractComponent from "./abstract-component";
 
 const createNewEventTemplate = (newEvent) => {
   const {type, time, offers, price, destination} = newEvent;
@@ -141,26 +141,18 @@ const createNewEventTemplate = (newEvent) => {
   );
 };
 
-export default class NewEvent {
+export default class NewEvent extends AbstractComponent {
   constructor(event) {
-    this._event = event;
+    super();
 
-    this._element = null;
+    this._event = event;
   }
 
   getTemplate() {
     return createNewEventTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(handler) {
+    this.getElement().addEventListener(`submit`, handler);
   }
 }
