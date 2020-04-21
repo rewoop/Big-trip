@@ -54,6 +54,8 @@ const render = (container, element, place) => {
     case RenderPosition.AFTEREND:
       container.after(element);
       break;
+    default:
+      throw new Error(`Нет такой вставки, пробуй другую`);
   }
 };
 
