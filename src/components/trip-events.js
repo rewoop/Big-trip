@@ -1,5 +1,6 @@
 import {EventSuffix, MAX_ISO_STRING_LENGTH, DEFAULT_EXTRA_HOURS, DEFAULT_EXTRA_DAYS, MAX_SHOWING_OFFERS} from "../const";
-import {castTimeFormat, checkSuffix, createElement} from "../utils";
+import {castTimeFormat, checkSuffix} from "../utils/common";
+import AbstractComponent from "./abstract-component";
 
 const createEventMarkup = (tripEvent) => {
   const {type, time, price, offers, destination} = tripEvent;
@@ -86,26 +87,19 @@ const createTripEventsTemplate = (tripEvent) => {
   );
 };
 
-export default class TripEvents {
+export default class TripEvents extends AbstractComponent {
   constructor(event) {
-    this._event = event;
+    super();
 
-    this._element = null;
+    this._event = event;
   }
 
   getTemplate() {
     return createTripEventsTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setEditButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, handler);
   }
 }
