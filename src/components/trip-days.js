@@ -1,9 +1,9 @@
 import AbstractComponent from "./abstract-component";
 
 const createTripDaysTemplate = (day, index) => {
-  const month = day.items[0].time.eventStartTime.toDateString().slice(4, 7).toUpperCase();
-  const date = day.items[0].time.eventStartTime.toDateString().slice(8, 10);
-  const dateISOString = day.items[0].time.eventStartTime.toISOString().slice(0, 10);
+  const month = day[0].time.eventStartTime.toDateString().slice(4, 7).toUpperCase();
+  const date = day[0].time.eventStartTime.toDateString().slice(8, 10);
+  const dateISOString = day[0].time.eventStartTime.toISOString().slice(0, 10);
 
   return (
     `<li class="trip-days__item  day">
