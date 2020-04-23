@@ -1,4 +1,5 @@
 const RenderPosition = {
+  BEFOREBEGIN: `beforebegin`,
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`,
   AFTEREND: `afterend`
@@ -21,6 +22,9 @@ const render = (container, element, place) => {
       break;
     case RenderPosition.AFTEREND:
       container.after(element.getElement());
+      break;
+    case RenderPosition.BEFOREBEGIN:
+      container.before(element.getElement());
       break;
     default:
       throw new Error(`Нет такой вставки, пробуй другую`);

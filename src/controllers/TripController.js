@@ -4,6 +4,7 @@ import {render, RenderPosition, replace} from "../utils/render";
 import Sort from "../components/sort";
 import TripDay from "../components/trip-days";
 import NoTripDays from "../components/no-trip-days";
+import TripList from "../components/trip-list";
 
 const renderTripEvents = (eventsList, container) => {
   eventsList.items.forEach((tripEvent) => {
@@ -41,39 +42,43 @@ const renderTripEvents = (eventsList, container) => {
   });
 };
 
-// const renderTripDays = (container, eventDays, siteTripEvents) => {
-//   render(siteTripEvents, new Sort(), RenderPosition.AFTERBEGIN);
-//
-//   eventDays.forEach((items, index) => {
-//     const tripDay = new TripDay(items, index);
-//     render(container, tripDay, RenderPosition.BEFOREEND);
-//     const tripEventsList = tripDay.getElement().querySelector(`.trip-events__list`);
-//     renderTripEvents(items, tripEventsList);
-//   });
-// };
-
 export default class TripController {
   constructor(container) {
     this._container = container;
+    this._tripList = new TripList();
     this._sort = new Sort();
     this._noTripDays = new NoTripDays();
   }
 
-  render(eventItems, siteTripEvents) {
-    const container = this._container.getElement();
+  render(events) {
+    const reduceEventItems = events.reduce((days, item) => {
+      const time = item.time.eventStartTime.toJSON().slice(5, 10);
+      days[time] = days[time] || [];
+      days[time].push(item);
+      return days;
+    }, {});
 
-    if (eventItems.length > 0) {
-      // renderTripDays(container, eventItems, siteTripEvents);
+    const groupEventItems = Object.keys(reduceEventItems).map((day) => {
+      return {
+        day,
+        items: reduceEventItems[day]
+      };
+    }).sort((a, b) => a.day > b.day ? 1 : -1);
 
-      render(siteTripEvents, this._sort, RenderPosition.AFTERBEGIN);
-      eventItems.forEach((items, index) => {
+    if (groupEventItems.length > 0) {
+      render(this._container, this._tripList, RenderPosition.BEFOREEND);
+      const tripListContainer = this._tripList.getElement();
+
+      render(tripListContainer, this._sort, RenderPosition.BEFOREBEGIN);
+
+      groupEventItems.forEach((items, index) => {
         const tripDay = new TripDay(items, index);
-        render(container, tripDay, RenderPosition.BEFOREEND);
+        render(tripListContainer, tripDay, RenderPosition.BEFOREEND);
         const tripEventsList = tripDay.getElement().querySelector(`.trip-events__list`);
         renderTripEvents(items, tripEventsList);
       });
     } else {
-      render(siteTripEvents, this._noTripDays, RenderPosition.BEFOREEND);
+      render(this._container, this._noTripDays, RenderPosition.BEFOREEND);
     }
   }
 }
