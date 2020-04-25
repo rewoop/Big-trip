@@ -10,4 +10,8 @@ export default class TripList extends AbstractComponent {
   getTemplate() {
     return createTripListTemplate();
   }
+
+  removeElement() {
+    this.getElement().innerHTML = ``;
+  }
 }

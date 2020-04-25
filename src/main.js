@@ -16,7 +16,7 @@ const siteTripEvents = siteMain.querySelector(`.trip-events`);
 
 render(siteHeader, new TripInfo(), RenderPosition.AFTERBEGIN);
 render(siteNavigationMenuHeader, new Menu(), RenderPosition.AFTEREND);
-render(siteNavigationMenu, new Filter(), RenderPosition.BEFOREEND);
+render(siteNavigationMenu, new Filter());
 
 const tripController = new TripController(siteTripEvents);
-tripController.render(tripEvents);
+tripController.renderTripList(tripEvents);

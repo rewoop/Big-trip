@@ -76,7 +76,8 @@ const generateTripEvent = () => {
     time: getEventTime(),
     price: getRandomIntegerNumber(MIN_EVENT_PRICE, MAX_EVENT_PRICE),
     offers: getCurrentOffers(),
-    destination: destinations[getRandomIntegerNumber(0, CITIES.length)]
+    destination: destinations[getRandomIntegerNumber(0, CITIES.length)],
+    isFavorite: getRandomBoolean()
   };
 };
 
