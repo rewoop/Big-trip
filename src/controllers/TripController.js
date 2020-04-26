@@ -5,6 +5,7 @@ import Sort, {SortType} from "../components/sort";
 import TripDay from "../components/trip-days";
 import NoTripDays from "../components/no-trip-days";
 import TripList from "../components/trip-list";
+import {FIRST_DAY_COUNTER} from "../const";
 
 const renderTripEvents = (eventsList) => {
   return eventsList.map((tripEvent) => {
@@ -60,6 +61,10 @@ const getSortedEvents = (events, sortType) => {
           items: reduceEventItems[day]
         };
       }).sort((a, b) => a.day > b.day ? 1 : -1);
+
+      sortedEvents.forEach((event) => {
+        event.items.sort((a, b) => a.time.eventStartTime > b.time.eventStartTime ? 1 : -1);
+      });
       break;
     case SortType.TIME:
       sortedEvents = events.slice().sort((a, b) => {
@@ -81,10 +86,9 @@ export default class TripController {
     this._tripList = new TripList();
     this._sort = new Sort();
     this._noTripDays = new NoTripDays();
-    this._renderEvents = this._renderEvents.bind(this);
   }
 
-  _renderEvents(events, container) {
+  renderEvents(events, container) {
     const defaultSortedEvents = getSortedEvents(events, SortType.EVENT);
 
     const renderSortingByDay = (currentEvents, currentContainer) => {
@@ -100,13 +104,13 @@ export default class TripController {
 
     this._sort.setSortTypeChangeHandler((sortType) => {
       const sortedEvents = getSortedEvents(events, sortType);
-      this._tripList.removeElement();
+      this._tripList.clearElement();
       if (sortType === SortType.EVENT) {
         renderSortingByDay(sortedEvents, container);
       } else {
-        sortedEvents.forEach((day, index) => {
-          const tripDay = new TripDay(day, index, sortType);
-          render(container, tripDay);
+        const tripDay = new TripDay(sortedEvents[0], FIRST_DAY_COUNTER, sortType);
+        render(container, tripDay);
+        sortedEvents.forEach((day) => {
           const tripEventsList = renderTripEvents(day);
           tripDay.renderEventsList(tripEventsList);
         });
@@ -119,9 +123,9 @@ export default class TripController {
       render(this._container, this._noTripDays);
       return;
     }
-    render(this._container, this._tripList);
     const tripListContainer = this._tripList.getElement();
+    this.renderEvents(events, tripListContainer);
+    render(this._container, this._tripList);
     render(tripListContainer, this._sort, RenderPosition.BEFOREBEGIN);
-    this._renderEvents(events, tripListContainer);
   }
 }

@@ -8,12 +8,10 @@ const createTripDaysTemplate = (day, index, sortType = SortType.EVENT) => {
   const dateISOString = day[0].time.eventStartTime.toISOString().slice(0, 10);
 
   const getDayInfo = (currentSortType) => {
-    if (currentSortType === SortType.EVENT) {
-      return `<span class="day__counter">${index + 1}</span>
-      <time class="day__date" datetime="${dateISOString}">${month} ${date}</time>`;
-    } else {
-      return ``;
-    }
+    return currentSortType === SortType.EVENT ? (
+      `<span class="day__counter">${index + 1}</span>
+      <time class="day__date" datetime="${dateISOString}">${month} ${date}</time>`
+    ) : ``;
   };
 
   return (
