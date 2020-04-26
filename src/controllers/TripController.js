@@ -52,6 +52,7 @@ const getSortedEvents = (events, sortType) => {
         const time = item.time.eventStartTime.toJSON().slice(5, 10);
         days[time] = days[time] || [];
         days[time].push(item);
+        Object.values(days).forEach((day) => day.sort((a, b) => a.time.eventStartTime > b.time.eventStartTime ? 1 : -1));
         return days;
       }, {});
 
@@ -61,10 +62,6 @@ const getSortedEvents = (events, sortType) => {
           items: reduceEventItems[day]
         };
       }).sort((a, b) => a.day > b.day ? 1 : -1);
-
-      sortedEvents.forEach((event) => {
-        event.items.sort((a, b) => a.time.eventStartTime > b.time.eventStartTime ? 1 : -1);
-      });
       break;
     case SortType.TIME:
       sortedEvents = events.slice().sort((a, b) => {
@@ -109,11 +106,11 @@ export default class TripController {
         renderSortingByDay(sortedEvents, container);
       } else {
         const tripDay = new TripDay(sortedEvents[0], FIRST_DAY_COUNTER, sortType);
-        render(container, tripDay);
         sortedEvents.forEach((day) => {
           const tripEventsList = renderTripEvents(day);
           tripDay.renderEventsList(tripEventsList);
         });
+        render(container, tripDay);
       }
     });
   }
