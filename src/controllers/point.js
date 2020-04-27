@@ -9,8 +9,6 @@ const Mode = {
 
 export default class PointController {
   constructor(onDataChange, onViewChange) {
-    // this._container = container;
-
     this._currentEvent = null;
     this._eventEditComponent = null;
     this._onDataChange = onDataChange;
@@ -20,7 +18,7 @@ export default class PointController {
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
-  renderCurrentEvent(event) {
+  render(event) {
     const oldEventComponent = this._currentEvent;
     const oldEventEditComponent = this._eventEditComponent;
 
@@ -55,12 +53,6 @@ export default class PointController {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceEditToEvent();
     }
-  }
-
-  render(eventsList) {
-    return eventsList.map((tripEvent) => {
-      return this.renderCurrentEvent(tripEvent);
-    });
   }
 
   _replaceEventToEdit() {

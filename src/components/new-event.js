@@ -2,11 +2,13 @@ import {
   castTimeFormat,
   checkSuffix
 } from "../utils/common";
-import {CITIES, TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix} from "../const";
+import {CITIES, TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix, EventTypeOffers} from "../const";
 import AbstractSmartComponent from "./abstract-smart-component";
+import {destinations} from "../mock/event";
 
-const createNewEventTemplate = (newEvent) => {
-  const {type, time, offers, price, destination, isFavorite} = newEvent;
+const createNewEventTemplate = (newEvent, options = {}) => {
+  const {time, price, isFavorite} = newEvent;
+  const {type, offers, destination} = options;
   const {description, photos, currentCity} = destination;
   const {eventStartTime, eventEndTime} = time;
 
@@ -93,7 +95,7 @@ const createNewEventTemplate = (newEvent) => {
 
               <div class="event__field-group  event__field-group--destination">
                 <label class="event__label  event__type-output" for="event-destination-1">
-                  ${type} ${EventSuffix[checkSuffix(type)]}
+                  ${type.charAt(0).toUpperCase()}${type.slice(1)} ${EventSuffix[checkSuffix(type)]}
                 </label>
                 <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${currentCity}" list="destination-list-1">
                 <datalist id="destination-list-1">
@@ -156,6 +158,9 @@ export default class NewEvent extends AbstractSmartComponent {
     super();
 
     this._event = event;
+    this._eventType = event.type;
+    this._eventOffers = event.offers;
+    this._eventDestination = event.destination;
     this._submitHandler = null;
     this._favoriteBtnHandler = null;
 
@@ -163,12 +168,17 @@ export default class NewEvent extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createNewEventTemplate(this._event);
+    return createNewEventTemplate(this._event, {
+      type: this._eventType,
+      offers: this._eventOffers,
+      destination: this._eventDestination
+    });
   }
 
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
     this.setFavoriteBtnHandler(this._favoriteBtnHandler);
+    this._subscribeOnEvents();
   }
 
   rerender() {
@@ -188,36 +198,26 @@ export default class NewEvent extends AbstractSmartComponent {
   _subscribeOnEvents() {
     const element = this.getElement();
 
-    const eventTypeGroup = element.querySelectorAll(`.event__type-group`);
+    const eventTypeList = element.querySelector(`.event__type-list`);
+    const eventDestination = element.querySelector(`#event-destination-1`);
 
-    if (eventTypeGroup) {
-      eventTypeGroup.forEach((group) => {
-        group.addEventListener(`change`, (evt) => {
-          evt.preventDefault();
-          const newEventType = evt.target.value;
-          this._event.type = newEventType.charAt(0).toUpperCase() + newEventType.slice(1);
-
-          this.rerender();
-        });
+    eventTypeList.addEventListener(`change`, (evt) => {
+      evt.preventDefault();
+      this._eventType = evt.target.value;
+      this._eventOffers = EventTypeOffers[evt.target.value].map((offer) => {
+        return Object.assign({}, offer);
       });
-    }
+      this.rerender();
+    });
 
-
-    //
-    // element.querySelector(`.card__repeat-toggle`)
-    //   .addEventListener(`click`, () => {
-    //     this._isRepeatingTask = !this._isRepeatingTask;
-    //
-    //     this.rerender();
-    //   });
-    //
-    // const repeatDays = element.querySelector(`.card__repeat-days`);
-    // if (repeatDays) {
-    //   repeatDays.addEventListener(`change`, (evt) => {
-    //     this._activeRepeatingDays[evt.target.value] = evt.target.checked;
-    //
-    //     this.rerender();
-    //   });
-    // }
+    eventDestination.addEventListener(`change`, (evt) => {
+      evt.preventDefault();
+      const index = destinations.findIndex((destination) => destination.currentCity === evt.target.value);
+      if (index === -1) {
+        return;
+      }
+      this._eventDestination = destinations[index];
+      this.rerender();
+    });
   }
 }

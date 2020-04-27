@@ -64,7 +64,7 @@ const generateTripEvent = () => {
   const currentType = getRandomItem(EVENT_TYPES);
 
   const getCurrentOffers = () => {
-    return EventTypeOffers[currentType].map((offer) => {
+    return EventTypeOffers[currentType.toLowerCase()].map((offer) => {
       const offerCopy = Object.assign({}, offer);
       offerCopy.required = getRandomBoolean();
       return offerCopy;
@@ -87,4 +87,4 @@ const generateTripEvents = (count) => {
     .map(generateTripEvent);
 };
 
-export {generateTripEvents};
+export {generateTripEvents, destinations};
