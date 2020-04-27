@@ -3,7 +3,7 @@ import {
   checkSuffix
 } from "../utils/common";
 import {CITIES, TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix} from "../const";
-import AbstractComponent from "./abstract-component";
+import AbstractSmartComponent from "./abstract-smart-component";
 
 const createNewEventTemplate = (newEvent) => {
   const {type, time, offers, price, destination, isFavorite} = newEvent;
@@ -151,18 +151,73 @@ const createNewEventTemplate = (newEvent) => {
   );
 };
 
-export default class NewEvent extends AbstractComponent {
+export default class NewEvent extends AbstractSmartComponent {
   constructor(event) {
     super();
 
     this._event = event;
+    this._submitHandler = null;
+    this._favoriteBtnHandler = null;
+
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
     return createNewEventTemplate(this._event);
   }
 
+  recoveryListeners() {
+    this.setSubmitHandler(this._submitHandler);
+    this.setFavoriteBtnHandler(this._favoriteBtnHandler);
+  }
+
+  rerender() {
+    super.rerender();
+  }
+
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
+    this._submitHandler = handler;
+  }
+
+  setFavoriteBtnHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
+    this._favoriteBtnHandler = handler;
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    const eventTypeGroup = element.querySelectorAll(`.event__type-group`);
+
+    if (eventTypeGroup) {
+      eventTypeGroup.forEach((group) => {
+        group.addEventListener(`change`, (evt) => {
+          evt.preventDefault();
+          const newEventType = evt.target.value;
+          this._event.type = newEventType.charAt(0).toUpperCase() + newEventType.slice(1);
+
+          this.rerender();
+        });
+      });
+    }
+
+
+    //
+    // element.querySelector(`.card__repeat-toggle`)
+    //   .addEventListener(`click`, () => {
+    //     this._isRepeatingTask = !this._isRepeatingTask;
+    //
+    //     this.rerender();
+    //   });
+    //
+    // const repeatDays = element.querySelector(`.card__repeat-days`);
+    // if (repeatDays) {
+    //   repeatDays.addEventListener(`change`, (evt) => {
+    //     this._activeRepeatingDays[evt.target.value] = evt.target.checked;
+    //
+    //     this.rerender();
+    //   });
+    // }
   }
 }

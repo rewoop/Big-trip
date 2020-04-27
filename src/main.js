@@ -3,7 +3,7 @@ import Menu from "./components/menu";
 import Filter from "./components/filter";
 import {generateTripEvents} from "./mock/event";
 import {render, RenderPosition} from "./utils/render";
-import TripController from "./controllers/TripController";
+import Trip from "./controllers/trip";
 
 const TRIP_DAYS_COUNT = 22;
 const tripEvents = generateTripEvents(TRIP_DAYS_COUNT);
@@ -18,5 +18,5 @@ render(siteHeader, new TripInfo(), RenderPosition.AFTERBEGIN);
 render(siteNavigationMenuHeader, new Menu(), RenderPosition.AFTEREND);
 render(siteNavigationMenu, new Filter());
 
-const tripController = new TripController(siteTripEvents);
+const tripController = new Trip(siteTripEvents);
 tripController.renderTripList(tripEvents);
