@@ -158,9 +158,9 @@ export default class NewEvent extends AbstractSmartComponent {
     super();
 
     this._event = event;
-    this._eventType = event.type;
-    this._eventOffers = event.offers;
-    this._eventDestination = event.destination;
+    this._eventType = event.type.slice();
+    this._eventOffers = event.offers.slice();
+    this._eventDestination = Object.assign({}, event.destination);
     this._submitHandler = null;
     this._favoriteBtnHandler = null;
 

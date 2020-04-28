@@ -65,33 +65,33 @@ export default class TripController {
   }
 
   _renderSortingByDay(currentEvents, currentContainer) {
-    currentEvents.map((day, index) => {
+    currentEvents.forEach((day, index) => {
       const tripDay = new TripDay(day.items, index);
       const pointController = new PointController(this._onDataChange, this._onViewChange);
       const tripEventsList = this._renderEventsList(day.items, pointController);
       tripDay.renderEventsList(tripEventsList);
       render(currentContainer, tripDay);
-      return this._pointControllers.push(pointController);
+      this._pointControllers.push(pointController);
     });
+  }
+
+  _renderSortingByType(currentEvents, currentContainer, sortType) {
+    const tripDay = new TripDay(currentEvents[0], FIRST_DAY_COUNTER, sortType);
+    currentEvents.forEach((day) => {
+      const pointController = new PointController(this._onDataChange, this._onViewChange);
+      const tripEventsList = this._renderEventsList(day, pointController);
+      tripDay.renderEventsList(tripEventsList);
+      this._pointControllers.push(pointController);
+    });
+    render(currentContainer, tripDay);
   }
 
   _onSortTypeChange(sortType) {
     const sortedEvents = getSortedEvents(this._events, sortType);
     const container = this._tripList.getElement();
-
+    this._pointControllers = [];
     this._tripList.clearElement();
-    if (sortType === SortType.EVENT) {
-      this._renderSortingByDay(sortedEvents, container);
-    } else {
-      const tripDay = new TripDay(sortedEvents[0], FIRST_DAY_COUNTER, sortType);
-      sortedEvents.map((day) => {
-        const pointController = new PointController(this._onDataChange, this._onViewChange);
-        const tripEventsList = this._renderEventsList(day, pointController);
-        tripDay.renderEventsList(tripEventsList);
-        return this._pointControllers.push(pointController);
-      });
-      render(container, tripDay);
-    }
+    return sortType === SortType.EVENT ? this._renderSortingByDay(sortedEvents, container) : this._renderSortingByType(sortedEvents, container, sortType);
   }
 
   _onDataChange(pointController, oldData, newData) {
