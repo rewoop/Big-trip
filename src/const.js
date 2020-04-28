@@ -56,20 +56,20 @@ const CITIES = [
 ];
 
 const EventTypeOffers = {
-  'Taxi': [
+  'taxi': [
     {
       id: `uber`,
       title: `Order Uber`,
       price: 20,
-      required: true
+      required: false
     }
   ],
-  'Bus': [
+  'bus': [
     {
       id: `seats`,
       title: `Choose seats`,
       price: 5,
-      required: true
+      required: false
     },
     {
       id: `meal`,
@@ -78,12 +78,12 @@ const EventTypeOffers = {
       required: false
     }
   ],
-  'Train': [
+  'train': [
     {
       id: `seats`,
       title: `Choose seats`,
       price: 5,
-      required: true
+      required: false
     },
     {
       id: `meal`,
@@ -92,12 +92,12 @@ const EventTypeOffers = {
       required: false
     }
   ],
-  'Ship': [
+  'ship': [
     {
       id: `seats`,
       title: `Choose seats`,
       price: 5,
-      required: true
+      required: false
     },
     {
       id: `meal`,
@@ -106,12 +106,12 @@ const EventTypeOffers = {
       required: false
     }
   ],
-  'Transport': [
+  'transport': [
     {
       id: `train`,
       title: `Travel by train`,
       price: 40,
-      required: true
+      required: false
     },
     {
       id: `meal`,
@@ -120,20 +120,20 @@ const EventTypeOffers = {
       required: false
     }
   ],
-  'Drive': [
+  'drive': [
     {
       id: `car`,
       title: `Rent a car`,
       price: 200,
-      required: true
+      required: false
     }
   ],
-  'Flight': [
+  'flight': [
     {
       id: `luggage`,
       title: `Add luggage`,
       price: 30,
-      required: true
+      required: false
     },
     {
       id: `comfort`,
@@ -142,20 +142,20 @@ const EventTypeOffers = {
       required: false
     }
   ],
-  'Check-in': [
+  'check-in': [
     {
       id: `breakfast`,
       title: `Add breakfast`,
       price: 50,
-      required: true
+      required: false
     }
   ],
-  'Sightseeing': [
+  'sightseeing': [
     {
       id: `tickets`,
       title: `Book tickets`,
       price: 40,
-      required: true
+      required: false
     },
     {
       id: `lunch`,
@@ -164,7 +164,7 @@ const EventTypeOffers = {
       required: false
     }
   ],
-  'Restaurant': [
+  'restaurant': [
     {
       id: `meal`,
       title: `Add meal`,
