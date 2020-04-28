@@ -64,24 +64,25 @@ export default class TripController {
     });
   }
 
+  _setPointCotrollerItems(events, container) {
+    const pointController = new PointController(this._onDataChange, this._onViewChange);
+    const tripEventsList = this._renderEventsList(events, pointController);
+    container.renderEventsList(tripEventsList);
+    this._pointControllers.push(pointController);
+  }
+
   _renderSortingByDay(currentEvents, currentContainer) {
     currentEvents.forEach((day, index) => {
       const tripDay = new TripDay(day.items, index);
-      const pointController = new PointController(this._onDataChange, this._onViewChange);
-      const tripEventsList = this._renderEventsList(day.items, pointController);
-      tripDay.renderEventsList(tripEventsList);
+      this._setPointCotrollerItems(day.items, tripDay);
       render(currentContainer, tripDay);
-      this._pointControllers.push(pointController);
     });
   }
 
   _renderSortingByType(currentEvents, currentContainer, sortType) {
     const tripDay = new TripDay(currentEvents[0], FIRST_DAY_COUNTER, sortType);
     currentEvents.forEach((day) => {
-      const pointController = new PointController(this._onDataChange, this._onViewChange);
-      const tripEventsList = this._renderEventsList(day, pointController);
-      tripDay.renderEventsList(tripEventsList);
-      this._pointControllers.push(pointController);
+      this._setPointCotrollerItems(day, tripDay);
     });
     render(currentContainer, tripDay);
   }

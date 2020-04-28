@@ -1,10 +1,14 @@
 import {
-  castTimeFormat,
-  checkSuffix
+  checkSuffix,
+  formatDate,
+  formatTime
 } from "../utils/common";
 import {CITIES, TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix, EventTypeOffers} from "../const";
 import AbstractSmartComponent from "./abstract-smart-component";
 import {destinations} from "../mock/event";
+import flatpickr from "flatpickr";
+
+import "flatpickr/dist/flatpickr.min.css";
 
 const createNewEventTemplate = (newEvent, options = {}) => {
   const {time, price, isFavorite} = newEvent;
@@ -37,10 +41,6 @@ const createNewEventTemplate = (newEvent, options = {}) => {
         `<option value="${city}"></option>`
       );
     }).join(`\n`);
-  };
-
-  const renderTimeFormat = (currentEventTime) => {
-    return `${castTimeFormat(currentEventTime.getDate())}/${castTimeFormat(currentEventTime.getMonth())}/${String(currentEventTime.getFullYear()).slice(2)} ${castTimeFormat(currentEventTime.getHours())}:${castTimeFormat(currentEventTime.getMinutes())}`;
   };
 
   const generateOffers = () => {
@@ -107,12 +107,12 @@ const createNewEventTemplate = (newEvent, options = {}) => {
                 <label class="visually-hidden" for="event-start-time-1">
                   From
                 </label>
-                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${renderTimeFormat(eventStartTime)}">
+                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(eventStartTime)} ${formatTime(eventStartTime)}">
                 &mdash;
                 <label class="visually-hidden" for="event-end-time-1">
                   To
                 </label>
-                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${renderTimeFormat(eventEndTime)}">
+                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(eventEndTime)} ${formatTime(eventEndTime)}">
               </div>
 
               <div class="event__field-group  event__field-group--price">
@@ -158,12 +158,14 @@ export default class NewEvent extends AbstractSmartComponent {
     super();
 
     this._event = event;
-    this._eventType = event.type.slice();
+    this._eventType = event.type;
     this._eventOffers = event.offers.slice();
     this._eventDestination = Object.assign({}, event.destination);
     this._submitHandler = null;
     this._favoriteBtnHandler = null;
+    this._flatpickr = null;
 
+    this._applyFlatpickr();
     this._subscribeOnEvents();
   }
 
@@ -183,6 +185,8 @@ export default class NewEvent extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
+
+    this._applyFlatpickr();
   }
 
   setSubmitHandler(handler) {
@@ -193,6 +197,28 @@ export default class NewEvent extends AbstractSmartComponent {
   setFavoriteBtnHandler(handler) {
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
     this._favoriteBtnHandler = handler;
+  }
+
+  setFlatpickr(dateElement, eventDate) {
+    this._flatpickr = flatpickr(dateElement, {
+      altInput: true,
+      allowInput: true,
+      dateFormat: `d/m/Y H:i`,
+      altFormat: `d/m/Y H:i`,
+      defaultDate: eventDate,
+    });
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    const dateStartElement = this.getElement().querySelector(`#event-start-time-1`);
+    this.setFlatpickr(dateStartElement, this._event.time.eventStartTime);
+    const dateEndElement = this.getElement().querySelector(`#event-end-time-1`);
+    this.setFlatpickr(dateEndElement, this._event.time.eventEndTime);
   }
 
   _subscribeOnEvents() {

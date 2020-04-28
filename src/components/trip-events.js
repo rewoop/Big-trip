@@ -1,5 +1,5 @@
-import {EventSuffix, MAX_ISO_STRING_LENGTH, DEFAULT_EXTRA_HOURS, DEFAULT_EXTRA_DAYS, MAX_SHOWING_OFFERS} from "../const";
-import {castTimeFormat, checkSuffix} from "../utils/common";
+import {EventSuffix, MAX_ISO_STRING_LENGTH, MAX_SHOWING_OFFERS} from "../const";
+import {checkSuffix, formatTime, getDurationDate} from "../utils/common";
 import AbstractComponent from "./abstract-component";
 
 const createEventMarkup = (tripEvent) => {
@@ -17,10 +17,10 @@ const createEventMarkup = (tripEvent) => {
   };
 
   const getDurationTime = () => {
-    const duration = new Date(eventEndTime - eventStartTime);
-    const durationMinutes = duration.getMinutes();
-    const durationHours = duration.getHours() - DEFAULT_EXTRA_HOURS;
-    const durationDays = duration.getDate() - DEFAULT_EXTRA_DAYS;
+    const duration = getDurationDate(eventStartTime, eventEndTime);
+    const durationMinutes = duration.minutes();
+    const durationHours = duration.hours();
+    const durationDays = duration.days();
 
     if (durationDays > 0) {
       if (durationHours > 0) {
@@ -37,16 +37,11 @@ const createEventMarkup = (tripEvent) => {
     const startISOString = eventStartTime.toISOString().slice(0, MAX_ISO_STRING_LENGTH);
     const endISOString = eventEndTime.toISOString().slice(0, MAX_ISO_STRING_LENGTH);
 
-    const startTimeHours = castTimeFormat(eventStartTime.getHours());
-    const startTimeMinutes = castTimeFormat(eventStartTime.getMinutes());
-    const endTimeHours = castTimeFormat(eventEndTime.getHours());
-    const endTimeMinutes = castTimeFormat(eventEndTime.getMinutes());
-
     return (
       `<p class="event__time">
-        <time class="event__start-time" datetime="${startISOString}">${startTimeHours}:${startTimeMinutes}</time>
+        <time class="event__start-time" datetime="${startISOString}">${formatTime(eventStartTime)}</time>
         &mdash;
-        <time class="event__end-time" datetime="${endISOString}">${endTimeHours}:${endTimeMinutes}</time>
+        <time class="event__end-time" datetime="${endISOString}">${formatTime(eventEndTime)}</time>
       </p>
        <p class="event__duration">${getDurationTime()}</p>`
     );
