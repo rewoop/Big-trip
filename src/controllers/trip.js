@@ -58,8 +58,10 @@ export default class TripController {
     this._sort.setSortTypeChangeHandler(this._onSortTypeChange);
   }
 
-  _renderEventsList(eventsList, pointController) {
+  _renderEventsList(eventsList) {
     return eventsList.map((tripEvent) => {
+      const pointController = new PointController(this._onDataChange, this._onViewChange);
+      this._pointControllers.push(pointController);
       return pointController.render(tripEvent);
     });
   }
@@ -67,10 +69,8 @@ export default class TripController {
   _renderSortingByDay(currentEvents, currentContainer) {
     currentEvents.forEach((day, index) => {
       const tripDay = new TripDay(day.items, index);
-      const pointController = new PointController(this._onDataChange, this._onViewChange);
-      const tripEventsList = this._renderEventsList(day.items, pointController);
+      const tripEventsList = this._renderEventsList(day.items);
       tripDay.renderEventsList(tripEventsList);
-      this._pointControllers.push(pointController);
       render(currentContainer, tripDay);
     });
   }
@@ -78,10 +78,8 @@ export default class TripController {
   _renderSortingByType(currentEvents, currentContainer, sortType) {
     const tripDay = new TripDay(currentEvents[0], FIRST_DAY_COUNTER, sortType);
     currentEvents.forEach((day) => {
-      const pointController = new PointController(this._onDataChange, this._onViewChange);
-      const tripEventsList = this._renderEventsList(day, pointController);
+      const tripEventsList = this._renderEventsList(day);
       tripDay.renderEventsList(tripEventsList);
-      this._pointControllers.push(pointController);
     });
     render(currentContainer, tripDay);
   }
