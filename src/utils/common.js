@@ -1,5 +1,6 @@
+import moment from "moment";
+
 const HALF_OF_RANDOM = 0.5;
-const MIN_TWO_DIGIT_NUMBER = 10;
 
 const getRandomItem = (items) => {
   const randomIndex = getRandomIntegerNumber(0, items.length);
@@ -12,10 +13,6 @@ const getRandomIntegerNumber = (min, max) => {
 };
 
 const getRandomBoolean = () => Math.random() > HALF_OF_RANDOM;
-
-const castTimeFormat = (value) => {
-  return value < MIN_TWO_DIGIT_NUMBER ? `0${value}` : String(value);
-};
 
 const shuffleItems = (items) => {
   for (let i = items.length - 1; i > 0; i--) {
@@ -30,4 +27,16 @@ const checkSuffix = (label) => {
   return modernLabel === `CHECK-IN` ? `CHECK_IN` : modernLabel;
 };
 
-export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, castTimeFormat, shuffleItems, checkSuffix};
+const formatTime = (date) => {
+  return moment(date).format(`HH:mm`);
+};
+
+const formatDate = (date) => {
+  return moment(date).format(`DD/MM/YYYY`);
+};
+
+const getDurationDate = (startDate, endDate) => {
+  return moment.duration(moment(endDate).diff(moment(startDate)));
+};
+
+export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, shuffleItems, checkSuffix, formatTime, formatDate, getDurationDate};
