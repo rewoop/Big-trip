@@ -1,6 +1,6 @@
 import TripEvents from "../components/trip-events";
 import NewEvent from "../components/new-event";
-import {replace} from "../utils/render";
+import {replace, remove} from "../utils/render";
 
 const Mode = {
   DEFAULT: `default`,
@@ -53,6 +53,12 @@ export default class PointController {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceEditToEvent();
     }
+  }
+
+  destroy() {
+    remove(this._eventEditComponent);
+    remove(this._currentEvent);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _replaceEventToEdit() {

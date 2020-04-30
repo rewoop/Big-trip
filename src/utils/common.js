@@ -39,4 +39,18 @@ const getDurationDate = (startDate, endDate) => {
   return moment.duration(moment(endDate).diff(moment(startDate)));
 };
 
-export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, shuffleItems, checkSuffix, formatTime, formatDate, getDurationDate};
+const isFutureDate = (nowDate, eventStartDate) => {
+  return eventStartDate > nowDate && !isOneDay(nowDate, eventStartDate);
+};
+
+const isPastDate = (nowDate, eventStartDate) => {
+  return eventStartDate < nowDate && !isOneDay(nowDate, eventStartDate);
+};
+
+const isOneDay = (dateA, dateB) => {
+  const a = moment(dateA);
+  const b = moment(dateB);
+  return a.diff(b, `days`) === 0 && dateA.getDate() === dateB.getDate();
+};
+
+export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, shuffleItems, checkSuffix, formatTime, formatDate, getDurationDate, isFutureDate, isPastDate};
