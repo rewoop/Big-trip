@@ -4,7 +4,7 @@ import TripDay from "../components/trip-days";
 import NoTripDays from "../components/no-trip-days";
 import TripList from "../components/trip-list";
 import {FIRST_DAY_COUNTER} from "../const";
-import PointController from "./point";
+import PointController, {Mode as PointControllerMode, EmptyPoint} from "./point";
 
 const getSortedEvents = (events, sortType) => {
   let sortedEvents = [];
@@ -70,7 +70,7 @@ export default class TripController {
     return eventsList.map((tripEvent) => {
       const pointController = new PointController(this._onDataChange, this._onViewChange);
       this._pointControllers.push(pointController);
-      return pointController.render(tripEvent);
+      return pointController.render(tripEvent, PointControllerMode.DEFAULT);
     });
   }
 
@@ -107,9 +107,24 @@ export default class TripController {
   }
 
   _onDataChange(pointController, oldData, newData) {
-    const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
-    if (isSuccess) {
-      pointController.render(newData);
+    if (oldData === EmptyPoint) {
+      this._creatingTask = null;
+      if (newData === null) {
+        pointController.destroy();
+        this._updatePoints();
+      } else {
+        this._pointsModel.addPoint(newData);
+        pointController.render(newData, PointControllerMode.DEFAULT);
+      }
+    } else if (newData === null) {
+      this._pointsModel.removePoint(oldData.id);
+      this._updatePoints();
+    } else {
+      const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+
+      if (isSuccess) {
+        pointController.render(newData, PointControllerMode.DEFAULT);
+      }
     }
   }
 

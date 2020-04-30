@@ -2,10 +2,12 @@ import TripEvents from "../components/trip-events";
 import NewEvent from "../components/new-event";
 import {replace, remove} from "../utils/render";
 
-const Mode = {
+export const Mode = {
   DEFAULT: `default`,
   EDIT: `edit`,
 };
+
+export const EmptyPoint = {};
 
 export default class PointController {
   constructor(onDataChange, onViewChange) {
@@ -18,9 +20,10 @@ export default class PointController {
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
-  render(event) {
+  render(event, mode) {
     const oldEventComponent = this._currentEvent;
     const oldEventEditComponent = this._eventEditComponent;
+    this._mode = mode;
 
     this._currentEvent = new TripEvents(event);
     this._eventEditComponent = new NewEvent(event);
@@ -38,13 +41,17 @@ export default class PointController {
 
     this._eventEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      this._replaceEditToEvent();
+      const data = this._eventEditComponent.getData();
+      this._onDataChange(this, event, data);
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
+
+    this._eventEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, event, null));
 
     if (oldEventEditComponent && oldEventComponent) {
       replace(this._currentEvent, oldEventComponent);
       replace(this._eventEditComponent, oldEventEditComponent);
+      this._replaceEditToEvent();
     }
     return this._currentEvent;
   }
@@ -71,6 +78,11 @@ export default class PointController {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
     this._eventEditComponent.rerender();
     replace(this._currentEvent, this._eventEditComponent);
+
+    if (document.contains(this._eventEditComponent.getElement())) {
+      replace(this._currentEvent, this._eventEditComponent);
+    }
+
     this._mode = Mode.DEFAULT;
   }
 

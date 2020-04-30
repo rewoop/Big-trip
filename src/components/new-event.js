@@ -153,6 +153,31 @@ const createNewEventTemplate = (newEvent, options = {}) => {
   );
 };
 
+const parseFormData = (formData) => {
+  return formData;
+  // const repeatingDays = CITIES.reduce((acc, day) => {
+  //   acc[day] = false;
+  //   return acc;
+  // }, {});
+  // console.log(repeatingDays);
+  // const {time, price, isFavorite} = newEvent;
+  // const {type, offers, destination} = options;
+  // const {description, photos, currentCity} = destination;
+  // const {eventStartTime, eventEndTime} = time;
+  //
+  // const date = formData.get(`date`);
+  //
+  // return {
+  //   description: formData.get(`text`),
+  //   color: formData.get(`color`),
+  //   dueDate: date ? new Date(date) : null,
+  //   repeatingDays: formData.getAll(`repeat`).reduce((acc, it) => {
+  //     acc[it] = true;
+  //     return acc;
+  //   }, repeatingDays),
+  // };
+};
+
 export default class NewEvent extends AbstractSmartComponent {
   constructor(event) {
     super();
@@ -164,6 +189,7 @@ export default class NewEvent extends AbstractSmartComponent {
     this._submitHandler = null;
     this._favoriteBtnHandler = null;
     this._flatpickr = null;
+    this._deleteButtonClickHandler = null;
 
     this._applyFlatpickr();
     this._subscribeOnEvents();
@@ -177,9 +203,19 @@ export default class NewEvent extends AbstractSmartComponent {
     });
   }
 
+  removeElement() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    super.removeElement();
+  }
+
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
     this.setFavoriteBtnHandler(this._favoriteBtnHandler);
+    this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
     this._subscribeOnEvents();
   }
 
@@ -187,6 +223,13 @@ export default class NewEvent extends AbstractSmartComponent {
     super.rerender();
 
     this._applyFlatpickr();
+  }
+
+  getData() {
+    const form = this.getElement().querySelector(`.event--edit`);
+    const formData = new FormData(form);
+
+    return parseFormData(formData);
   }
 
   setSubmitHandler(handler) {
@@ -197,6 +240,13 @@ export default class NewEvent extends AbstractSmartComponent {
   setFavoriteBtnHandler(handler) {
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
     this._favoriteBtnHandler = handler;
+  }
+
+  setDeleteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, handler);
+
+    this._deleteButtonClickHandler = handler;
   }
 
   setFlatpickr(dateElement, eventDate) {
