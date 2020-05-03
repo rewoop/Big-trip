@@ -154,28 +154,13 @@ const createNewEventTemplate = (newEvent, options = {}) => {
 };
 
 const parseFormData = (formData) => {
-  return formData;
-  // const repeatingDays = CITIES.reduce((acc, day) => {
-  //   acc[day] = false;
-  //   return acc;
-  // }, {});
-  // console.log(repeatingDays);
-  // const {time, price, isFavorite} = newEvent;
-  // const {type, offers, destination} = options;
-  // const {description, photos, currentCity} = destination;
-  // const {eventStartTime, eventEndTime} = time;
-  //
-  // const date = formData.get(`date`);
-  //
-  // return {
-  //   description: formData.get(`text`),
-  //   color: formData.get(`color`),
-  //   dueDate: date ? new Date(date) : null,
-  //   repeatingDays: formData.getAll(`repeat`).reduce((acc, it) => {
-  //     acc[it] = true;
-  //     return acc;
-  //   }, repeatingDays),
-  // };
+  return {
+    eventType: formData.get(`event-type`),
+    currentCity: formData.get(`event-destination`),
+    eventStartTime: formData.get(`event-start-time`),
+    eventEndTime: formData.get(`event-end-time`),
+    offers: formData.getAll(`event-offer-`)
+  };
 };
 
 export default class NewEvent extends AbstractSmartComponent {
@@ -226,7 +211,7 @@ export default class NewEvent extends AbstractSmartComponent {
   }
 
   getData() {
-    const form = this.getElement().querySelector(`.event--edit`);
+    const form = this.getElement();
     const formData = new FormData(form);
 
     return parseFormData(formData);
