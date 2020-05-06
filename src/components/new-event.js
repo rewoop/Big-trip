@@ -47,7 +47,7 @@ const createNewEventTemplate = (newEvent, options = {}) => {
     return offers.map((offer) => {
       return (
         `<div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}-1" type="checkbox" name="event-offer-${offer.id}" ${offer.required ? `checked` : ``}>
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}-1" type="checkbox" name="event-offer-${offer.id}" value="${offer.id}" ${offer.required ? `checked` : ``}>
           <label class="event__offer-label" for="event-offer-${offer.id}-1">
             <span class="event__offer-title">${offer.title}</span>
             &plus;
@@ -154,11 +154,18 @@ const createNewEventTemplate = (newEvent, options = {}) => {
 };
 
 const parseFormData = (formData) => {
+
   return {
-    eventType: formData.get(`event-type`),
-    currentCity: formData.get(`event-destination`),
-    eventStartTime: formData.get(`event-start-time`),
-    eventEndTime: formData.get(`event-end-time`),
+    type: `train`,
+    destination: {
+      currentCity: formData.get(`event-destination`)
+    },
+    time: {
+      eventStartTime: formData.get(`event-start-time`),
+      eventEndTime: formData.get(`event-end-time`)
+    },
+    price: formData.get(`event-price`),
+    isFavorite: !!formData.get(`event-favorite`),
     offers: formData.getAll(`event-offer-`)
   };
 };

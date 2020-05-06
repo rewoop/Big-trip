@@ -19,7 +19,7 @@ const MAX_ISO_STRING_LENGTH = 16;
 const MAX_SHOWING_OFFERS = 3;
 const FIRST_DAY_COUNTER = 1;
 
-const EVENT_TYPE = {
+const EventType = {
   TAXI: `Taxi`,
   BUS: `Bus`,
   TRAIN: `Train`,
@@ -32,7 +32,7 @@ const EVENT_TYPE = {
   RESTAURANT: `Restaurant`
 };
 
-const EVENT_TYPES = Object.values(EVENT_TYPE);
+const EVENT_TYPES = Object.values(EventType);
 
 const EventSuffix = {
   TAXI: `to `,
