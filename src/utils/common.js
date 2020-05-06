@@ -35,6 +35,11 @@ const formatDate = (date) => {
   return moment(date).format(`DD/MM/YYYY`);
 };
 
+const formatDateToDefault = (date) => {
+  moment.defaultFormat = `DD.MM.YYYY HH:mm`;
+  return moment(date, moment.defaultFormat).toDate();
+};
+
 const getDurationDate = (startDate, endDate) => {
   return moment.duration(moment(endDate).diff(moment(startDate)));
 };
@@ -53,4 +58,4 @@ const isOneDay = (dateA, dateB) => {
   return a.diff(b, `days`) === 0 && dateA.getDate() === dateB.getDate();
 };
 
-export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, shuffleItems, checkSuffix, formatTime, formatDate, getDurationDate, isFutureDate, isPastDate};
+export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, shuffleItems, checkSuffix, formatTime, formatDate, getDurationDate, isFutureDate, isPastDate, formatDateToDefault};

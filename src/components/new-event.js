@@ -1,7 +1,7 @@
 import {
   checkSuffix,
-  formatDate,
-  formatTime
+  formatDate, formatDateToDefault,
+  formatTime,
 } from "../utils/common";
 import {CITIES, TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix, EventTypeOffers} from "../const";
 import AbstractSmartComponent from "./abstract-smart-component";
@@ -154,15 +154,17 @@ const createNewEventTemplate = (newEvent, options = {}) => {
 };
 
 const parseFormData = (formData) => {
+  const parseDestinationInfo = (city) => {
+    const index = destinations.findIndex((destination) => destination.currentCity === city);
+    return index === -1 ? city : destinations[index];
+  };
 
   return {
     type: `train`,
-    destination: {
-      currentCity: formData.get(`event-destination`)
-    },
+    destination: parseDestinationInfo(formData.get(`event-destination`)),
     time: {
-      eventStartTime: formData.get(`event-start-time`),
-      eventEndTime: formData.get(`event-end-time`)
+      eventStartTime: formatDateToDefault(formData.get(`event-start-time`)),
+      eventEndTime: formatDateToDefault(formData.get(`event-end-time`)),
     },
     price: formData.get(`event-price`),
     isFavorite: !!formData.get(`event-favorite`),
@@ -245,6 +247,9 @@ export default class NewEvent extends AbstractSmartComponent {
     this._flatpickr = flatpickr(dateElement, {
       altInput: true,
       allowInput: true,
+      enableTime: true,
+      // eslint-disable-next-line camelcase
+      time_24hr: true,
       dateFormat: `d/m/Y H:i`,
       altFormat: `d/m/Y H:i`,
       defaultDate: eventDate,
