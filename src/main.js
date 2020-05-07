@@ -16,6 +16,7 @@ const siteMain = document.querySelector(`.page-main`);
 const siteNavigationMenu = siteHeader.querySelector(`.trip-controls`);
 const siteNavigationMenuHeader = siteNavigationMenu.querySelector(`h2`);
 const siteTripEvents = siteMain.querySelector(`.trip-events`);
+const newEventButton = document.querySelector(`.trip-main__event-add-btn`);
 
 render(siteHeader, new TripInfo(), RenderPosition.AFTERBEGIN);
 render(siteNavigationMenuHeader, new Menu(), RenderPosition.AFTEREND);
@@ -25,3 +26,8 @@ filterController.render();
 
 const tripController = new TripController(siteTripEvents, pointsModel);
 tripController.renderTripList();
+
+newEventButton.addEventListener(`click`, (evt) => {
+  evt.preventDefault();
+  tripController.createPoint(newEventButton);
+});

@@ -1,7 +1,7 @@
 import {
   checkSuffix,
   formatDate, formatDateToDefault,
-  formatTime, formatString
+  formatTime, formatString, parseDestinationInfo
 } from "../utils/common";
 import {CITIES, TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix, EventTypeOffers} from "../const";
 import AbstractSmartComponent from "./abstract-smart-component";
@@ -12,7 +12,7 @@ import "flatpickr/dist/flatpickr.min.css";
 
 const createNewEventTemplate = (newEvent, options = {}) => {
   const {time, price, isFavorite} = newEvent;
-  const {type, offers, destination} = options;
+  const {type, offers, destination, mode} = options;
   const {description, photos, currentCity} = destination;
   const {eventStartTime, eventEndTime} = time;
 
@@ -124,7 +124,7 @@ const createNewEventTemplate = (newEvent, options = {}) => {
               </div>
 
               <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-              <button class="event__reset-btn" type="reset">Cancel</button>
+              <button class="event__reset-btn" type="reset">${mode !== `adding` ? `Delete` : `Cancel`}</button>
               <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
               <label class="event__favorite-btn" for="event-favorite-1">
                 <span class="visually-hidden">Add to favorite</span>
@@ -155,10 +155,6 @@ const createNewEventTemplate = (newEvent, options = {}) => {
 
 const parseFormData = (formData) => {
   const choosenType = formatString(formData.get(`event-type`));
-  const parseDestinationInfo = (city) => {
-    const index = destinations.findIndex((destination) => destination.currentCity === city);
-    return index === -1 ? city : destinations[index];
-  };
 
   const reduseDefaultOffers = EventTypeOffers[formData.get(`event-type`)]
     .reduce((acc, offer) => {
@@ -188,7 +184,7 @@ const parseFormData = (formData) => {
 
   return {
     type: choosenType,
-    destination: parseDestinationInfo(formData.get(`event-destination`)),
+    destination: parseDestinationInfo(destinations, formData.get(`event-destination`)),
     time: {
       eventStartTime: formatDateToDefault(formData.get(`event-start-time`)),
       eventEndTime: formatDateToDefault(formData.get(`event-end-time`)),
@@ -200,9 +196,10 @@ const parseFormData = (formData) => {
 };
 
 export default class NewEvent extends AbstractSmartComponent {
-  constructor(event) {
+  constructor(event, mode) {
     super();
 
+    this._mode = mode;
     this._event = event;
     this._eventType = event.type;
     this._eventOffers = event.offers.slice();
@@ -220,7 +217,8 @@ export default class NewEvent extends AbstractSmartComponent {
     return createNewEventTemplate(this._event, {
       type: this._eventType,
       offers: this._eventOffers,
-      destination: this._eventDestination
+      destination: this._eventDestination,
+      mode: this._mode
     });
   }
 

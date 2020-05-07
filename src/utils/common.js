@@ -62,4 +62,9 @@ const isOneDay = (dateA, dateB) => {
   return a.diff(b, `days`) === 0 && dateA.getDate() === dateB.getDate();
 };
 
-export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, shuffleItems, checkSuffix, formatTime, formatDate, getDurationDate, isFutureDate, isPastDate, formatDateToDefault, formatString};
+const parseDestinationInfo = (destinations, city) => {
+  const index = destinations.findIndex((destination) => destination.currentCity === city);
+  return index === -1 ? city : destinations[index];
+};
+
+export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, shuffleItems, checkSuffix, formatTime, formatDate, getDurationDate, isFutureDate, isPastDate, formatDateToDefault, formatString, parseDestinationInfo};

@@ -1,12 +1,8 @@
 import {FilterType} from "../const";
 import {isFutureDate, isPastDate} from "./common";
 
-const getFutureFilteredPoints = (points, date) => {
-  return points.filter((point) => isFutureDate(date, point.time.eventStartTime));
-};
-
-const getPastFilteredPoints = (points, date) => {
-  return points.filter((point) => isPastDate(date, point.time.eventStartTime));
+const getFilteredPoints = (points, date, handler) => {
+  return points.filter((point) => handler(date, point.time.eventStartTime));
 };
 
 const getPointsByFilter = (points, filterType) => {
@@ -16,9 +12,9 @@ const getPointsByFilter = (points, filterType) => {
     case FilterType.EVERYTHING:
       return points;
     case FilterType.FUTURE:
-      return getFutureFilteredPoints(points, nowDate);
+      return getFilteredPoints(points, nowDate, isFutureDate);
     case FilterType.PAST:
-      return getPastFilteredPoints(points, nowDate);
+      return getFilteredPoints(points, nowDate, isPastDate);
   }
 
   return points;

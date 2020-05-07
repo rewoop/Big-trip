@@ -48,6 +48,7 @@ export default class TripController {
     this._tripList = new TripList();
     this._sort = new Sort();
     this._noTripDays = new NoTripDays();
+    this._creatingPoint = null;
 
     this._pointControllers = [];
 
@@ -58,6 +59,19 @@ export default class TripController {
 
     this._sort.setSortTypeChangeHandler(this._onSortTypeChange);
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
+  }
+
+  createPoint(button) {
+    if (this._creatingPoint) {
+      return;
+    }
+
+    this._onNewEventViewChange(button);
+
+    const container = this._tripList.getElement();
+    this._creatingPoint = new PointController(this._onDataChange, this._onViewChange);
+    const newEvent = this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING);
+    render(container, newEvent, RenderPosition.AFTERBEGIN);
   }
 
   _removePoints() {
@@ -108,13 +122,14 @@ export default class TripController {
 
   _onDataChange(pointController, oldData, newData) {
     if (oldData === EmptyPoint) {
-      this._creatingTask = null;
+      this._creatingPoint = null;
       if (newData === null) {
         pointController.destroy();
         this._updatePoints();
       } else {
         this._pointsModel.addPoint(newData);
         pointController.render(newData, PointControllerMode.DEFAULT);
+        this._updatePoints();
       }
     } else if (newData === null) {
       this._pointsModel.removePoint(oldData.id);
@@ -126,6 +141,12 @@ export default class TripController {
         pointController.render(newData, PointControllerMode.DEFAULT);
       }
     }
+  }
+
+  _onNewEventViewChange(button) {
+    this._onViewChange();
+    button.setAttribute(`disabled`, `disabled`);
+    this._updatePoints();
   }
 
   _onViewChange() {

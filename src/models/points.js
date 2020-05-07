@@ -42,14 +42,17 @@ export default class Points {
     return true;
   }
 
-  updatePoint(id, point) {
+  getCurrentPointIndex(id) {
     const index = this._points.findIndex((it) => it.id === id);
 
     if (index === -1) {
       return false;
     }
+    return index;
+  }
 
-    this._points = [].concat(this._points.slice(0, index), point, this._points.slice(index + 1));
+  updatePoint(id, point) {
+    this._points = [].concat(this._points.slice(0, this.getCurrentPointIndex(id)), point, this._points.slice(this.getCurrentPointIndex(id) + 1));
 
     this._callHandlers(this._dataChangeHandlers);
 
