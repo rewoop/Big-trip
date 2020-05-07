@@ -1,7 +1,7 @@
 import {
   checkSuffix,
   formatDate, formatDateToDefault,
-  formatTime,
+  formatTime, formatString
 } from "../utils/common";
 import {CITIES, TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix, EventTypeOffers} from "../const";
 import AbstractSmartComponent from "./abstract-smart-component";
@@ -22,16 +22,16 @@ const createNewEventTemplate = (newEvent, options = {}) => {
     }).join(`\n`);
   };
 
-  const getTypesMarkup = (eventType) => {
+  const getTypesMarkup = (eventType, isChecked) => {
     return `<div class="event__type-item">
-      <input id="event-type-${eventType.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType.toLowerCase()}">
+      <input id="event-type-${eventType.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType.toLowerCase()}" ${isChecked ? `checked` : ``}>
       <label class="event__type-label  event__type-label--${eventType.toLowerCase()}" for="event-type-${eventType.toLowerCase()}-1">${eventType}</label>
     </div>`;
   };
 
   const renderEventTypesGroupMarkup = (start, end) => {
     return EVENT_TYPES.slice(start, end).map((eventType) => {
-      return getTypesMarkup(eventType);
+      return getTypesMarkup(eventType, eventType === formatString(type));
     }).join(`\n`);
   };
 
@@ -47,7 +47,7 @@ const createNewEventTemplate = (newEvent, options = {}) => {
     return offers.map((offer) => {
       return (
         `<div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}-1" type="checkbox" name="event-offer-${offer.id}" value="${offer.id}" ${offer.required ? `checked` : ``}>
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}-1" type="checkbox" name="event-offer" value="${offer.id}" ${offer.required ? `checked` : ``}>
           <label class="event__offer-label" for="event-offer-${offer.id}-1">
             <span class="event__offer-title">${offer.title}</span>
             &plus;
@@ -95,7 +95,7 @@ const createNewEventTemplate = (newEvent, options = {}) => {
 
               <div class="event__field-group  event__field-group--destination">
                 <label class="event__label  event__type-output" for="event-destination-1">
-                  ${type.charAt(0).toUpperCase()}${type.slice(1)} ${EventSuffix[checkSuffix(type)]}
+                  ${formatString(type)} ${EventSuffix[checkSuffix(type)]}
                 </label>
                 <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${currentCity}" list="destination-list-1">
                 <datalist id="destination-list-1">
@@ -154,13 +154,40 @@ const createNewEventTemplate = (newEvent, options = {}) => {
 };
 
 const parseFormData = (formData) => {
+  const choosenType = formatString(formData.get(`event-type`));
   const parseDestinationInfo = (city) => {
     const index = destinations.findIndex((destination) => destination.currentCity === city);
     return index === -1 ? city : destinations[index];
   };
 
+  const reduseDefaultOffers = EventTypeOffers[formData.get(`event-type`)]
+    .reduce((acc, offer) => {
+      acc[offer.id] = false;
+      return acc;
+    }, {});
+
+  const reduseChoosenOffers = formData.getAll(`event-offer`).reduce((acc, offer) => {
+    acc[offer] = true;
+    return acc;
+  }, reduseDefaultOffers);
+
+  const formatChoosenOffers = () => {
+    let offers = [];
+    EventTypeOffers[formData.get(`event-type`)].forEach((offer) => {
+      for (const offerId in reduseChoosenOffers) {
+        if (offer.id === offerId) {
+          offers.push(Object.assign({}, offer, {
+            id: offerId,
+            required: reduseChoosenOffers[offerId]
+          }));
+        }
+      }
+    });
+    return offers;
+  };
+
   return {
-    type: `train`,
+    type: choosenType,
     destination: parseDestinationInfo(formData.get(`event-destination`)),
     time: {
       eventStartTime: formatDateToDefault(formData.get(`event-start-time`)),
@@ -168,7 +195,7 @@ const parseFormData = (formData) => {
     },
     price: formData.get(`event-price`),
     isFavorite: !!formData.get(`event-favorite`),
-    offers: formData.getAll(`event-offer-`)
+    offers: formatChoosenOffers()
   };
 };
 
@@ -273,6 +300,7 @@ export default class NewEvent extends AbstractSmartComponent {
 
     const eventTypeList = element.querySelector(`.event__type-list`);
     const eventDestination = element.querySelector(`#event-destination-1`);
+    const eventOffersList = element.querySelector(`.event__available-offers`);
 
     eventTypeList.addEventListener(`change`, (evt) => {
       evt.preventDefault();
@@ -291,6 +319,11 @@ export default class NewEvent extends AbstractSmartComponent {
       }
       this._eventDestination = destinations[index];
       this.rerender();
+    });
+
+    eventOffersList.addEventListener(`change`, (evt) => {
+      const offer = element.querySelector(`#event-offer-${evt.target.value}-1`);
+      offer.toggleAttribute(`checked`);
     });
   }
 }

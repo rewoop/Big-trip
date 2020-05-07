@@ -27,6 +27,10 @@ const checkSuffix = (label) => {
   return modernLabel === `CHECK-IN` ? `CHECK_IN` : modernLabel;
 };
 
+const formatString = (string) => {
+  return `${string.charAt(0).toUpperCase()}${string.slice(1)}`;
+};
+
 const formatTime = (date) => {
   return moment(date).format(`HH:mm`);
 };
@@ -58,4 +62,4 @@ const isOneDay = (dateA, dateB) => {
   return a.diff(b, `days`) === 0 && dateA.getDate() === dateB.getDate();
 };
 
-export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, shuffleItems, checkSuffix, formatTime, formatDate, getDurationDate, isFutureDate, isPastDate, formatDateToDefault};
+export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, shuffleItems, checkSuffix, formatTime, formatDate, getDurationDate, isFutureDate, isPastDate, formatDateToDefault, formatString};
