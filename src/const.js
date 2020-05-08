@@ -19,18 +19,20 @@ const MAX_ISO_STRING_LENGTH = 16;
 const MAX_SHOWING_OFFERS = 3;
 const FIRST_DAY_COUNTER = 1;
 
-const EVENT_TYPES = [
-  `Taxi`,
-  `Bus`,
-  `Train`,
-  `Ship`,
-  `Transport`,
-  `Drive`,
-  `Flight`,
-  `Check-in`,
-  `Sightseeing`,
-  `Restaurant`
-];
+const EventType = {
+  TAXI: `Taxi`,
+  BUS: `Bus`,
+  TRAIN: `Train`,
+  SHIP: `Ship`,
+  TRANSPORT: `Transport`,
+  DRIVE: `Drive`,
+  FLIGHT: `Flight`,
+  CHECK_IN: `Check-in`,
+  SIGHTSEEING: `Sightseeing`,
+  RESTAURANT: `Restaurant`
+};
+
+const EVENT_TYPES = Object.values(EventType);
 
 const EventSuffix = {
   TAXI: `to `,
@@ -180,4 +182,10 @@ const DESCRIPTION_SENTENCES = [
   `Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`
 ];
 
-export {EVENT_TYPES, EventSuffix, CITIES, EventTypeOffers, DESCRIPTION_SENTENCES, MIN_COUNT_DESCRIPTION, MAX_COUNT_DESCRIPTION, CURRENT_YEAR, MIN_MONTH, MAX_MONTH, MIN_DAY, MAX_SUMM_DAY, MAX_DAY, MIN_HOURS, MAX_HOURS, MIN_MINUTES, MIN_SUMM_MINUTES, MAX_MINUTES, TRANSFER_EVENTS, ACTIVITY_EVENTS, MIN_EVENT_PRICE, MAX_EVENT_PRICE, MAX_ISO_STRING_LENGTH, MAX_SHOWING_OFFERS, FIRST_DAY_COUNTER};
+const FilterType = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`
+};
+
+export {EVENT_TYPES, EventSuffix, CITIES, EventTypeOffers, DESCRIPTION_SENTENCES, MIN_COUNT_DESCRIPTION, MAX_COUNT_DESCRIPTION, CURRENT_YEAR, MIN_MONTH, MAX_MONTH, MIN_DAY, MAX_SUMM_DAY, MAX_DAY, MIN_HOURS, MAX_HOURS, MIN_MINUTES, MIN_SUMM_MINUTES, MAX_MINUTES, TRANSFER_EVENTS, ACTIVITY_EVENTS, MIN_EVENT_PRICE, MAX_EVENT_PRICE, MAX_ISO_STRING_LENGTH, MAX_SHOWING_OFFERS, FIRST_DAY_COUNTER, FilterType};

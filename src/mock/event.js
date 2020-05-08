@@ -72,6 +72,7 @@ const generateTripEvent = () => {
   };
 
   return {
+    id: String(new Date() + Math.random()),
     type: currentType,
     time: getEventTime(),
     price: getRandomIntegerNumber(MIN_EVENT_PRICE, MAX_EVENT_PRICE),
