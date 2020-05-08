@@ -29,5 +29,6 @@ tripController.renderTripList();
 
 newEventButton.addEventListener(`click`, (evt) => {
   evt.preventDefault();
+  filterController.setDefaultView();
   tripController.createPoint(newEventButton);
 });

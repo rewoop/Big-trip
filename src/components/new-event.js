@@ -3,18 +3,23 @@ import {
   formatDate, formatDateToDefault,
   formatTime, formatString, parseDestinationInfo
 } from "../utils/common";
-import {CITIES, TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix, EventTypeOffers} from "../const";
+import {TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix, EventTypeOffers} from "../const";
+import {Mode} from "../controllers/point";
 import AbstractSmartComponent from "./abstract-smart-component";
 import {destinations} from "../mock/event";
 import flatpickr from "flatpickr";
+import {encode} from "he";
 
 import "flatpickr/dist/flatpickr.min.css";
 
 const createNewEventTemplate = (newEvent, options = {}) => {
-  const {time, price, isFavorite} = newEvent;
+  const {time, price: notSanitizedPrice, isFavorite} = newEvent;
   const {type, offers, destination, mode} = options;
-  const {description, photos, currentCity} = destination;
+  const {description, photos, currentCity: notSanitizedCurrentCity} = destination;
   const {eventStartTime, eventEndTime} = time;
+
+  const price = encode(notSanitizedPrice.toString());
+  const currentCity = encode(notSanitizedCurrentCity);
 
   const renderPhotosMarkup = () => {
     return photos.map((photo) => {
@@ -36,11 +41,26 @@ const createNewEventTemplate = (newEvent, options = {}) => {
   };
 
   const renderDestinationsMarkup = () => {
-    return CITIES.map((city) => {
+    return destinations.map((currentDestination) => {
       return (
-        `<option value="${city}"></option>`
+        `<option value="${currentDestination.currentCity}"></option>`
       );
     }).join(`\n`);
+  };
+
+  const renderDestinationDescriptionMarkup = () => {
+    return description && photos && currentCity ? (
+      `<section class="event__section  event__section--destination">
+        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+        <p class="event__destination-description">${description}</p>
+
+        <div class="event__photos-container">
+          <div class="event__photos-tape">
+            ${renderPhotosMarkup()}
+          </div>
+        </div>
+      </section>`
+    ) : ``;
   };
 
   const generateOffers = () => {
@@ -70,6 +90,19 @@ const createNewEventTemplate = (newEvent, options = {}) => {
     ) : ``;
   };
 
+  const checkEventMode = () => {
+    return mode !== Mode.ADDING ? (
+      `<button class="event__reset-btn" type="reset">Delete</button>
+      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
+      <label class="event__favorite-btn" for="event-favorite-1">
+      <span class="visually-hidden">Add to favorite</span>
+    <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+      <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+      </svg>
+      </label>`
+    ) : `<button class="event__reset-btn" type="reset">Cancel</button>`;
+  };
+
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
             <header class="event__header">
@@ -97,7 +130,7 @@ const createNewEventTemplate = (newEvent, options = {}) => {
                 <label class="event__label  event__type-output" for="event-destination-1">
                   ${formatString(type)} ${EventSuffix[checkSuffix(type)]}
                 </label>
-                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${currentCity}" list="destination-list-1">
+                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${currentCity}" list="destination-list-1" required autocomplete="off">
                 <datalist id="destination-list-1">
                   ${renderDestinationsMarkup()}
                 </datalist>
@@ -120,34 +153,18 @@ const createNewEventTemplate = (newEvent, options = {}) => {
                   <span class="visually-hidden">Price</span>
                   &euro;
                 </label>
-                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" pattern="^[0-9]+$" title="Разрешены только числовые значения">
               </div>
 
               <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-              <button class="event__reset-btn" type="reset">${mode !== `adding` ? `Delete` : `Cancel`}</button>
-              <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
-              <label class="event__favorite-btn" for="event-favorite-1">
-                <span class="visually-hidden">Add to favorite</span>
-                <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
-                  <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
-                </svg>
-              </label>
+              ${checkEventMode()}
               <button class="event__rollup-btn" type="button">
                 <span class="visually-hidden">Open event</span>
               </button>
             </header>
             <section class="event__details">
               ${checkOffers()}
-              <section class="event__section  event__section--destination">
-                <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                <p class="event__destination-description">${description}</p>
-
-                <div class="event__photos-container">
-                  <div class="event__photos-tape">
-                    ${renderPhotosMarkup()}
-                  </div>
-                </div>
-              </section>
+              ${renderDestinationDescriptionMarkup()}
             </section>
           </form>`
   );
@@ -257,6 +274,9 @@ export default class NewEvent extends AbstractSmartComponent {
   }
 
   setFavoriteBtnHandler(handler) {
+    if (this._mode === Mode.ADDING) {
+      return;
+    }
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
     this._favoriteBtnHandler = handler;
   }
@@ -313,6 +333,7 @@ export default class NewEvent extends AbstractSmartComponent {
       evt.preventDefault();
       const index = destinations.findIndex((destination) => destination.currentCity === evt.target.value);
       if (index === -1) {
+        eventDestination.setCustomValidity(`Выберете город из списка`);
         return;
       }
       this._eventDestination = destinations[index];

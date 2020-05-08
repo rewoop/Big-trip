@@ -1,9 +1,7 @@
 import TripEvents from "../components/trip-events";
 import NewEvent from "../components/new-event";
-import {parseDestinationInfo} from "../utils/common";
 import {replace, remove} from "../utils/render";
 import {EventTypeOffers} from "../const";
-import {destinations} from "../mock/event";
 
 export const Mode = {
   ADDING: `adding`,
@@ -20,7 +18,11 @@ export const EmptyPoint = {
   },
   price: 0,
   offers: EventTypeOffers[`taxi`],
-  destination: parseDestinationInfo(destinations, `Paris`),
+  destination: {
+    description: ``,
+    photos: ``,
+    currentCity: ``
+  },
   isFavorite: false
 };
 
@@ -35,10 +37,11 @@ export default class PointController {
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
-  render(event, mode) {
+  render(event, mode, newEventBtn) {
     const oldEventComponent = this._currentEvent;
     const oldEventEditComponent = this._eventEditComponent;
     this._mode = mode;
+    this._button = newEventBtn;
 
     this._currentEvent = new TripEvents(event);
     this._eventEditComponent = new NewEvent(event, this._mode);
@@ -51,17 +54,23 @@ export default class PointController {
     this._eventEditComponent.setFavoriteBtnHandler(() => {
       this._onDataChange(this, event, Object.assign({}, event, {
         isFavorite: !event.isFavorite,
-      }));
+      }), true);
     });
 
     this._eventEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
       const data = this._eventEditComponent.getData();
-      this._onDataChange(this, event, data);
+      if (mode === Mode.ADDING) {
+        this._onDataChange(this, event, data, false, this._button);
+      } else {
+        this._onDataChange(this, event, data);
+      }
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
 
-    this._eventEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, event, null));
+    this._eventEditComponent.setDeleteButtonClickHandler(() => {
+      return mode === Mode.ADDING ? this._onDataChange(this, event, null, false, this._button) : this._onDataChange(this, event, null);
+    });
 
     if (mode === Mode.DEFAULT) {
       if (oldEventEditComponent && oldEventComponent) {
@@ -113,7 +122,7 @@ export default class PointController {
 
     if (isEscKey) {
       if (this._mode === Mode.ADDING) {
-        this._onDataChange(this, EmptyPoint, null);
+        this._onDataChange(this, EmptyPoint, null, false, this._button);
       }
       this._replaceEditToEvent();
       document.removeEventListener(`keydown`, this._onEscKeyDown);

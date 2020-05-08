@@ -70,7 +70,7 @@ export default class TripController {
 
     const container = this._tripList.getElement();
     this._creatingPoint = new PointController(this._onDataChange, this._onViewChange);
-    const newEvent = this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING);
+    const newEvent = this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING, button);
     render(container, newEvent, RenderPosition.AFTERBEGIN);
   }
 
@@ -106,7 +106,10 @@ export default class TripController {
     render(currentContainer, tripDay);
   }
 
-  _onSortTypeChange(sortType) {
+  _onSortTypeChange(sortType, button = null) {
+    if (button) {
+      this._sort.setDefaultView();
+    }
     const points = this._pointsModel.getPointsAll();
     const sortedEvents = getSortedEvents(points, sortType);
     const container = this._tripList.getElement();
@@ -120,16 +123,23 @@ export default class TripController {
     this.renderEvents(this._tripList.getElement(), this._pointsModel.getPoints());
   }
 
-  _onDataChange(pointController, oldData, newData) {
+  _onDataChange(pointController, oldData, newData, isFavBtnHandler = false, newEventBtn = null) {
     if (oldData === EmptyPoint) {
       this._creatingPoint = null;
       if (newData === null) {
         pointController.destroy();
         this._updatePoints();
+        if (newEventBtn) {
+          newEventBtn.removeAttribute(`disabled`);
+        }
       } else {
         this._pointsModel.addPoint(newData);
         pointController.render(newData, PointControllerMode.DEFAULT);
         this._updatePoints();
+        if (newEventBtn) {
+          newEventBtn.removeAttribute(`disabled`);
+          this._sort.removeDisabled();
+        }
       }
     } else if (newData === null) {
       this._pointsModel.removePoint(oldData.id);
@@ -137,16 +147,16 @@ export default class TripController {
     } else {
       const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
 
-      if (isSuccess) {
+      if (isSuccess && !isFavBtnHandler) {
         pointController.render(newData, PointControllerMode.DEFAULT);
       }
     }
   }
 
   _onNewEventViewChange(button) {
-    this._onViewChange();
     button.setAttribute(`disabled`, `disabled`);
-    this._updatePoints();
+    this._onViewChange();
+    this._onSortTypeChange(SortType.EVENT, button);
   }
 
   _onViewChange() {
