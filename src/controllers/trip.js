@@ -3,7 +3,7 @@ import Sort, {SortType} from "../components/sort";
 import TripDay from "../components/trip-days";
 import NoTripDays from "../components/no-trip-days";
 import TripList from "../components/trip-list";
-import {FIRST_DAY_COUNTER} from "../const";
+import {FIRST_DAY_COUNTER, HIDDEN_CLASS} from "../const";
 import PointController, {Mode as PointControllerMode, EmptyPoint} from "./point";
 
 const getSortedEvents = (events, sortType) => {
@@ -59,6 +59,14 @@ export default class TripController {
 
     this._sort.setSortTypeChangeHandler(this._onSortTypeChange);
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
+  }
+
+  hide() {
+    this._container.classList.add(HIDDEN_CLASS);
+  }
+
+  show() {
+    this._container.classList.remove(HIDDEN_CLASS);
   }
 
   createPoint(button) {
