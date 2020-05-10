@@ -265,7 +265,7 @@ export default class NewEvent extends AbstractSmartComponent {
     const form = this.getElement();
     const formData = new FormData(form);
 
-    return parseFormData(formData);
+    return Object.assign({}, parseFormData(formData), {id: this._event.id});
   }
 
   setSubmitHandler(handler) {

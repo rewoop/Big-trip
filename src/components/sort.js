@@ -80,7 +80,7 @@ export default class Sort extends AbstractSmartComponent {
         }
         this._currenSortType = sortType;
         this._setSortTypeChangeHandler = handler;
-        handler(this._currenSortType);
+        setInterval(handler(this._currenSortType), 1000);
       });
     });
   }

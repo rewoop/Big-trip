@@ -31,32 +31,30 @@ tripController.renderTripList();
 
 newEventButton.addEventListener(`click`, (evt) => {
   evt.preventDefault();
-  filterController.setDefaultView();
+  filterController.setDefaultView(true);
   tripController.createPoint(newEventButton);
 });
 
-// const dateTo = new Date();
-// const dateFrom = (() => {
-//   const d = new Date(dateTo);
-//   d.setDate(d.getDate() - 7);
-//   return d;
-// })();
 const statisticsComponent = new StatisticsComponent({points: pointsModel});
 render(siteTripEvents, statisticsComponent, RenderPosition.AFTEREND);
 statisticsComponent.hide();
 
 siteMenu.setOnChange((menuItem) => {
+  const setCurrentView = (menu, oldElement, newElement) => {
+    siteMenu.setActiveItem(menu);
+    filterController.setDefaultView();
+    oldElement.hide();
+    newElement.show();
+  };
+
   switch (menuItem) {
     case MenuItem.TABLE:
-      siteMenu.setActiveItem(MenuItem.TABLE);
-      statisticsComponent.hide();
-      tripController.show();
+      setCurrentView(MenuItem.TABLE, statisticsComponent, tripController);
+      newEventButton.removeAttribute(`disabled`);
       break;
     case MenuItem.STATISTICS:
-      siteMenu.setActiveItem(MenuItem.STATISTICS);
-      filterController.setDefaultView();
-      tripController.hide();
-      statisticsComponent.show();
+      setCurrentView(MenuItem.STATISTICS, tripController, statisticsComponent);
+      newEventButton.setAttribute(`disabled`, `disabled`);
       break;
   }
 });
