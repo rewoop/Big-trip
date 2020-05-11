@@ -42,7 +42,7 @@ statisticsComponent.hide();
 siteMenu.setOnChange((menuItem) => {
   const setCurrentView = (menu, oldElement, newElement) => {
     siteMenu.setActiveItem(menu);
-    filterController.setDefaultView();
+    filterController.setDefaultView(menu);
     oldElement.hide();
     newElement.show();
   };

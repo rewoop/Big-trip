@@ -40,6 +40,16 @@ export default class FilterComponent extends AbstractComponent {
     return createFilterTemplate(this._filters);
   }
 
+  setDisableInputs() {
+    this.getElement().querySelectorAll(`.trip-filters__filter-input`)
+      .forEach((input) => input.setAttribute(`disabled`, `disabled`));
+  }
+
+  removeDisableInputs() {
+    this.getElement().querySelectorAll(`.trip-filters__filter-input`)
+      .forEach((input) => input.removeAttribute(`disabled`));
+  }
+
   setFilterChangeHandler(handler) {
     this.getElement().addEventListener(`change`, (evt) => {
       const filterName = getFilterNameById(evt.target.id);

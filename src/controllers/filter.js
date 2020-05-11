@@ -1,6 +1,7 @@
 import FilterComponent from "../components/filter";
 import {FilterType} from "../const";
 import {render, replace} from "../utils/render";
+import {MenuItem} from "../components/menu";
 
 export default class FilterController {
   constructor(container, pointsModel) {
@@ -36,10 +37,11 @@ export default class FilterController {
     }
   }
 
-  setDefaultView() {
+  setDefaultView(menuItem) {
     this._pointsModel.setFilter(FilterType.EVERYTHING);
     this._activeFilterType = FilterType.EVERYTHING;
     this.render();
+    return menuItem === MenuItem.STATISTICS ? this._filterComponent.setDisableInputs() : this._filterComponent.removeDisableInputs();
   }
 
   _onFilterChange(filterType) {

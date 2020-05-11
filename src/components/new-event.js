@@ -104,7 +104,7 @@ const createNewEventTemplate = (newEvent, options = {}) => {
   };
 
   return (
-    `<form class="trip-events__item  event  event--edit" action="#" method="post">
+    `<li><form class="trip-events__item  event  event--edit" action="#" method="post">
             <header class="event__header">
               <div class="event__type-wrapper">
                 <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -166,7 +166,7 @@ const createNewEventTemplate = (newEvent, options = {}) => {
               ${checkOffers()}
               ${renderDestinationDescriptionMarkup()}
             </section>
-          </form>`
+          </form></li>`
   );
 };
 
@@ -262,14 +262,14 @@ export default class NewEvent extends AbstractSmartComponent {
   }
 
   getData() {
-    const form = this.getElement();
+    const form = this.getElement().querySelector(`form`);
     const formData = new FormData(form);
 
     return Object.assign({}, parseFormData(formData), {id: this._event.id});
   }
 
   setSubmitHandler(handler) {
-    this.getElement().addEventListener(`submit`, handler);
+    this.getElement().querySelector(`form`).addEventListener(`submit`, handler);
     this._submitHandler = handler;
   }
 
@@ -314,7 +314,7 @@ export default class NewEvent extends AbstractSmartComponent {
   }
 
   _subscribeOnEvents() {
-    const element = this.getElement();
+    const element = this.getElement().querySelector(`form`);
 
     const eventTypeList = element.querySelector(`.event__type-list`);
     const eventDestination = element.querySelector(`#event-destination-1`);
