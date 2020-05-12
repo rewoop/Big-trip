@@ -1,7 +1,6 @@
 import {
   checkSuffix,
-  formatDate, formatDateToDefault,
-  formatTime, formatString, parseDestinationInfo, formatOfferTitleToId,
+  formatDate, formatTime, formatString, formatOfferTitleToId,
 } from "../utils/common";
 import {TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix} from "../const";
 import {Mode} from "../controllers/point";
@@ -169,48 +168,6 @@ const createNewEventTemplate = (newEvent, options = {}) => {
   );
 };
 
-const parseFormData = (formData, destinations, offersByType) => {
-  const choosenType = formatString(formData.get(`event-type`));
-
-  const reduseDefaultOffers = offersByType.get(formData.get(`event-type`))
-    .reduce((acc, offer) => {
-      acc[offer.id] = false;
-      return acc;
-    }, {});
-
-  const reduseChoosenOffers = formData.getAll(`event-offer`).reduce((acc, offer) => {
-    acc[offer] = true;
-    return acc;
-  }, reduseDefaultOffers);
-
-  const formatChoosenOffers = () => {
-    let offers = [];
-    offersByType.get(formData.get(`event-type`)).forEach((offer) => {
-      for (const offerId in reduseChoosenOffers) {
-        if (offer.id === offerId) {
-          offers.push(Object.assign({}, offer, {
-            id: offerId,
-            required: reduseChoosenOffers[offerId]
-          }));
-        }
-      }
-    });
-    return offers;
-  };
-
-  return {
-    type: choosenType,
-    destination: parseDestinationInfo(destinations, formData.get(`event-destination`)),
-    time: {
-      eventStartTime: formatDateToDefault(formData.get(`event-start-time`)),
-      eventEndTime: formatDateToDefault(formData.get(`event-end-time`)),
-    },
-    price: formData.get(`event-price`),
-    isFavorite: !!formData.get(`event-favorite`),
-    offers: formatChoosenOffers()
-  };
-};
-
 export default class NewEvent extends AbstractSmartComponent {
   constructor(event, mode, pointsModel) {
     super();
@@ -266,9 +223,7 @@ export default class NewEvent extends AbstractSmartComponent {
 
   getData() {
     const form = this.getElement().querySelector(`form`);
-    const formData = new FormData(form);
-
-    return Object.assign({}, parseFormData(formData, this._destinations, this._offersByType), {id: this._event.id});
+    return new FormData(form);
   }
 
   setSubmitHandler(handler) {

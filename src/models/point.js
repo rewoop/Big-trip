@@ -1,4 +1,4 @@
-import {formatOfferTitleToId, formatString} from "../utils/common";
+import {formatOfferTitleToId, formatString, formatOffers} from "../utils/common";
 
 export default class Point {
   constructor(data) {
@@ -11,8 +11,7 @@ export default class Point {
     this.price = data[`base_price`];
     this.offers = data[`offers`].map((offer) => {
       return Object.assign({}, offer, {
-        id: formatOfferTitleToId(offer.title),
-        required: true
+        id: formatOfferTitleToId(offer.title)
       });
     });
     this.destination = {
@@ -23,17 +22,22 @@ export default class Point {
     this.isFavorite = data[`is_favorite`];
   }
 
-  // toRAW() {
-  //   return {
-  //     "id": this.id,
-  //     "description": this.description,
-  //     "due_date": this.dueDate ? this.dueDate.toISOString() : null,
-  //     "repeating_days": this.repeatingDays,
-  //     "color": this.color,
-  //     "is_favorite": this.isFavorite,
-  //     "is_archived": this.isArchive,
-  //   };
-  // }
+  toRAW() {
+    return {
+      "id": this.id,
+      "type": this.type.toLowerCase(),
+      "date_from": this.time.eventStartTime.toISOString(),
+      "date_to": this.time.eventEndTime.toISOString(),
+      "base_price": parseInt(this.price, 10),
+      "offers": this.offers ? formatOffers(this.offers) : null,
+      "destination": this.destination ? {
+        "name": this.destination.currentCity,
+        "pictures": this.destination.photos,
+        "description": this.destination.description
+      } : null,
+      "is_favorite": this.isFavorite
+    };
+  }
 
   static parsePoint(data) {
     return new Point(data);

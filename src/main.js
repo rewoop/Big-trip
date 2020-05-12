@@ -6,12 +6,15 @@ import FilterController from "./controllers/filter";
 import {render, RenderPosition} from "./utils/render";
 import TripController from "./controllers/trip";
 import Points from "./models/points";
+import LoadingComponent from "./components/loading-events";
+import {removeComponent} from "./utils/common";
 
 const AUTHORIZATION = `Basic Llan­fair­pwll­gwyn­gyll­go­ge­rych­wyrn­dro­bwll­llan­ty­si­lio­go­go­goch`;
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
 
 const api = new API(END_POINT, AUTHORIZATION);
 const pointsModel = new Points();
+const loadingComponent = new LoadingComponent();
 
 const siteHeader = document.querySelector(`.trip-main`);
 const siteMain = document.querySelector(`.page-main`);
@@ -23,15 +26,18 @@ const siteMenu = new Menu();
 
 render(siteHeader, new TripInfo(), RenderPosition.AFTERBEGIN);
 render(siteNavigationMenuHeader, siteMenu, RenderPosition.AFTEREND);
+render(siteTripEvents, loadingComponent);
 
 const filterController = new FilterController(siteNavigationMenu, pointsModel);
 filterController.render();
-const tripController = new TripController(siteTripEvents, pointsModel);
+
+const tripController = new TripController(siteTripEvents, pointsModel, api);
 api.getData()
   .then((data) => {
     pointsModel.setPoints(data.events);
     pointsModel.setOffersByType(data.offers);
     pointsModel.setDestinations(data.destinations);
+    removeComponent(loadingComponent);
     tripController.renderTripList();
   });
 

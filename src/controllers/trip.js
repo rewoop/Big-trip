@@ -5,6 +5,7 @@ import NoTripDays from "../components/no-trip-days";
 import TripList from "../components/trip-list";
 import {FIRST_DAY_COUNTER, HIDDEN_CLASS} from "../const";
 import PointController, {Mode as PointControllerMode, EmptyPoint} from "./point";
+import {removeComponent} from "../utils/common";
 
 const getSortedEvents = (events, sortType) => {
   let sortedEvents = [];
@@ -41,9 +42,10 @@ const getSortedEvents = (events, sortType) => {
 };
 
 export default class TripController {
-  constructor(container, pointsModel) {
+  constructor(container, pointsModel, api) {
     this._container = container;
     this._pointsModel = pointsModel;
+    this._api = api;
 
     this._tripList = new TripList();
     this._sort = new Sort();
@@ -132,7 +134,7 @@ export default class TripController {
     if (this._pointsModel.getPointsAll().length <= 0) {
       render(this._container, this._noTripDays);
     } else {
-      this._noTripDays.hide();
+      removeComponent(this._noTripDays);
       this.renderEvents(this._tripList.getElement(), this._pointsModel.getPoints());
     }
   }
@@ -159,11 +161,14 @@ export default class TripController {
       this._pointsModel.removePoint(oldData.id);
       this._updatePoints();
     } else {
-      const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+      this._api.updatePoint(oldData.id, newData)
+        .then((pointModel) => {
+          const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
 
-      if (isSuccess && !isFavBtnHandler) {
-        pointController.render(newData, PointControllerMode.DEFAULT);
-      }
+          if (isSuccess && !isFavBtnHandler) {
+            pointController.render(pointModel, PointControllerMode.DEFAULT);
+          }
+        });
     }
   }
 

@@ -24,8 +24,7 @@ const API = class {
 
   getPoints() {
     return this._load({
-      url: `points`,
-      method: Method.GET,
+      url: `points`
     })
       .then((responce) => responce.json())
       .then(Point.parsePoints);
@@ -33,16 +32,14 @@ const API = class {
 
   getDestinations() {
     return this._load({
-      url: `destinations`,
-      method: Method.GET,
+      url: `destinations`
     })
       .then((response) => response.json());
   }
 
   getOffers() {
     return this._load({
-      url: `offers`,
-      method: Method.GET,
+      url: `offers`
     })
       .then((response) => response.json());
   }
@@ -92,16 +89,16 @@ const API = class {
   //     .then(Point.parsePoint);
   // }
   //
-  // updatePoint(id, data) {
-  //   return this._load({
-  //     url: `points/${id}`,
-  //     method: Method.PUT,
-  //     body: JSON.stringify(data.toRAW()),
-  //     headers: new Headers({"Content-Type": `application/json`})
-  //   })
-  //     .then((response) => response.json())
-  //     .then(Point.parsePoint);
-  // }
+  updatePoint(id, data) {
+    return this._load({
+      url: `points/${id}`,
+      method: Method.PUT,
+      body: JSON.stringify(data.toRAW()),
+      headers: new Headers({"Content-Type": `application/json`})
+    })
+      .then((response) => response.json())
+      .then(Point.parsePoint);
+  }
 
   // deletePoint(id) {
   //   return this._load({url: `points/${id}`, method: Method.DELETE});
