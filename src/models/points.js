@@ -4,6 +4,8 @@ import {FilterType} from "../const";
 export default class Points {
   constructor() {
     this._points = [];
+    this._OffersByType = [];
+    this._destinations = [];
     this._activeFilterType = FilterType.EVERYTHING;
 
     this._dataChangeHandlers = [];
@@ -18,9 +20,28 @@ export default class Points {
     return this._points;
   }
 
+  getOffersByType() {
+    return this._OffersByType;
+  }
+
+  getDestinations() {
+    return this._destinations;
+  }
+
   setPoints(points) {
-    this._points = Array.from(points);
+    this._points = points ? Array.from(points) : [];
     this._callHandlers(this._dataChangeHandlers);
+  }
+
+  setOffersByType(offers) {
+    this._OffersByType = offers ? new Map() : [];
+    for (const item of offers) {
+      this._OffersByType.set(item.type, item.offers);
+    }
+  }
+
+  setDestinations(destinations) {
+    this._destinations = destinations ? Array.from(destinations) : [];
   }
 
   setFilter(filterType) {

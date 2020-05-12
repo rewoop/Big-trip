@@ -1,16 +1,17 @@
+import API from "./api";
 import TripInfo from "./components/trip-info";
 import Menu, {MenuItem} from "./components/menu";
 import StatisticsComponent from "./components/statistics";
 import FilterController from "./controllers/filter";
-import {generateTripEvents} from "./mock/event";
 import {render, RenderPosition} from "./utils/render";
 import TripController from "./controllers/trip";
 import Points from "./models/points";
 
-const TRIP_DAYS_COUNT = 22;
-const tripEvents = generateTripEvents(TRIP_DAYS_COUNT);
+const AUTHORIZATION = `Basic Llan­fair­pwll­gwyn­gyll­go­ge­rych­wyrn­dro­bwll­llan­ty­si­lio­go­go­goch`;
+const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
+
+const api = new API(END_POINT, AUTHORIZATION);
 const pointsModel = new Points();
-pointsModel.setPoints(tripEvents);
 
 const siteHeader = document.querySelector(`.trip-main`);
 const siteMain = document.querySelector(`.page-main`);
@@ -25,9 +26,14 @@ render(siteNavigationMenuHeader, siteMenu, RenderPosition.AFTEREND);
 
 const filterController = new FilterController(siteNavigationMenu, pointsModel);
 filterController.render();
-
 const tripController = new TripController(siteTripEvents, pointsModel);
-tripController.renderTripList();
+api.getData()
+  .then((data) => {
+    pointsModel.setPoints(data.events);
+    pointsModel.setOffersByType(data.offers);
+    pointsModel.setDestinations(data.destinations);
+    tripController.renderTripList();
+  });
 
 newEventButton.addEventListener(`click`, (evt) => {
   evt.preventDefault();
@@ -58,3 +64,4 @@ siteMenu.setOnChange((menuItem) => {
       break;
   }
 });
+

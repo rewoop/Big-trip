@@ -78,7 +78,7 @@ export default class TripController {
     this._onNewEventViewChange(this._newEventButton);
 
     const container = this._tripList.getElement();
-    this._creatingPoint = new PointController(this._onDataChange, this._onViewChange);
+    this._creatingPoint = new PointController(this._onDataChange, this._onViewChange, this._pointsModel);
     const newEvent = this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING, button);
     render(container, newEvent, RenderPosition.AFTERBEGIN);
   }
@@ -91,7 +91,7 @@ export default class TripController {
 
   _renderEventsList(eventsList) {
     return eventsList.map((tripEvent) => {
-      const pointController = new PointController(this._onDataChange, this._onViewChange);
+      const pointController = new PointController(this._onDataChange, this._onViewChange, this._pointsModel);
       this._pointControllers.push(pointController);
       return pointController.render(tripEvent, PointControllerMode.DEFAULT);
     });
@@ -192,7 +192,7 @@ export default class TripController {
 
   renderTripList() {
     const points = this._pointsModel.getPointsAll();
-    if (points.length <= 0) {
+    if (points.length < 1) {
       render(this._container, this._noTripDays);
       return;
     }

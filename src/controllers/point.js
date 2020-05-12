@@ -1,7 +1,6 @@
 import TripEvents from "../components/trip-events";
 import NewEvent from "../components/new-event";
 import {replace, remove} from "../utils/render";
-import {EventTypeOffers} from "../const";
 
 export const Mode = {
   ADDING: `adding`,
@@ -10,28 +9,32 @@ export const Mode = {
 };
 
 export const EmptyPoint = {
-  id: String(new Date() + Math.random()),
+  id: Math.random(),
   type: `taxi`,
   time: {
     eventStartTime: new Date(),
     eventEndTime: new Date(),
   },
   price: 0,
-  offers: EventTypeOffers[`taxi`],
+  offers: [],
   destination: {
     description: ``,
-    photos: ``,
+    photos: {
+      src: ``,
+      description: ``
+    },
     currentCity: ``
   },
   isFavorite: false
 };
 
 export default class PointController {
-  constructor(onDataChange, onViewChange) {
+  constructor(onDataChange, onViewChange, pointsModel) {
     this._currentEvent = null;
     this._eventEditComponent = null;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
+    this._pointsModel = pointsModel;
     this._mode = Mode.DEFAULT;
 
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
@@ -44,7 +47,7 @@ export default class PointController {
     this._button = newEventBtn;
 
     this._currentEvent = new TripEvents(event);
-    this._eventEditComponent = new NewEvent(event, this._mode);
+    this._eventEditComponent = new NewEvent(event, this._mode, this._pointsModel);
 
     this._currentEvent.setEditButtonClickHandler(() => {
       this._replaceEventToEdit();

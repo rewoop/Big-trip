@@ -67,4 +67,8 @@ const parseDestinationInfo = (destinations, city) => {
   return index === -1 ? city : destinations[index];
 };
 
-export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, shuffleItems, checkSuffix, formatTime, formatDate, getDurationDate, isFutureDate, isPastDate, formatDateToDefault, formatString, parseDestinationInfo};
+const formatOfferTitleToId = (string) => {
+  return string.replace(/\s+/g, `-`).toLowerCase();
+};
+
+export {formatOfferTitleToId, getRandomItem, getRandomIntegerNumber, getRandomBoolean, shuffleItems, checkSuffix, formatTime, formatDate, getDurationDate, isFutureDate, isPastDate, formatDateToDefault, formatString, parseDestinationInfo};

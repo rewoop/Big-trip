@@ -288,8 +288,9 @@ export default class StatisticsComponent extends AbstractSmartComponent {
 
     this._points = points;
 
-    this._daysChart = null;
-    this._colorsChart = null;
+    this._moneyChart = null;
+    this._transportChart = null;
+    this._timeSpentChart = null;
 
     this._renderCharts();
   }
