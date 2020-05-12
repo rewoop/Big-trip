@@ -1,7 +1,8 @@
 import TripEvents from "../components/trip-events";
 import NewEvent from "../components/new-event";
 import {replace, remove} from "../utils/render";
-import {EventTypeOffers} from "../const";
+import {formatDateToDefault, formatString, parseDestinationInfo} from "../utils/common";
+import Point from "../models/point";
 
 export const Mode = {
   ADDING: `adding`,
@@ -10,28 +11,81 @@ export const Mode = {
 };
 
 export const EmptyPoint = {
-  id: String(new Date() + Math.random()),
+  id: Math.random(),
   type: `taxi`,
   time: {
     eventStartTime: new Date(),
     eventEndTime: new Date(),
   },
   price: 0,
-  offers: EventTypeOffers[`taxi`],
+  offers: [],
   destination: {
     description: ``,
-    photos: ``,
+    photos: {
+      src: ``,
+      description: ``
+    },
     currentCity: ``
   },
   isFavorite: false
 };
 
+const parseFormData = (formData, destinations, offersByType, eventData) => {
+  const choosenType = formatString(formData.get(`event-type`));
+
+  const reduseDefaultOffers = offersByType.get(formData.get(`event-type`))
+    .reduce((acc, offer) => {
+      acc[offer.id] = false;
+      return acc;
+    }, {});
+
+  const reduseChoosenOffers = formData.getAll(`event-offer`).reduce((acc, offer) => {
+    acc[offer] = true;
+    return acc;
+  }, reduseDefaultOffers);
+
+  const formatChoosenOffers = () => {
+    let offers = [];
+    offersByType.get(formData.get(`event-type`)).forEach((offer) => {
+      for (const offerId in reduseChoosenOffers) {
+        if (offer.id === offerId) {
+          offers.push(Object.assign({}, offer, {
+            id: offerId,
+            required: reduseChoosenOffers[offerId]
+          }));
+        }
+      }
+    });
+    return offers;
+  };
+
+  const currentEventDestination = parseDestinationInfo(destinations, formData.get(`event-destination`));
+
+  return new Point({
+    "id": eventData.id,
+    "type": choosenType,
+    "destination": {
+      "name": currentEventDestination.currentCity,
+      "pictures": currentEventDestination.photos,
+      "description": currentEventDestination.description
+    },
+    "date_from": formatDateToDefault(formData.get(`event-start-time`)),
+    "date_to": formatDateToDefault(formData.get(`event-end-time`)),
+    "base_price": formData.get(`event-price`),
+    "is_favorite": !!formData.get(`event-favorite`),
+    "offers": formatChoosenOffers()
+  });
+};
+
 export default class PointController {
-  constructor(onDataChange, onViewChange) {
+  constructor(onDataChange, onViewChange, pointsModel) {
     this._currentEvent = null;
     this._eventEditComponent = null;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
+    this._pointsModel = pointsModel;
+    this._offersByType = this._pointsModel.getOffersByType();
+    this._destinations = this._pointsModel.getDestinations();
     this._mode = Mode.DEFAULT;
 
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
@@ -44,7 +98,7 @@ export default class PointController {
     this._button = newEventBtn;
 
     this._currentEvent = new TripEvents(event);
-    this._eventEditComponent = new NewEvent(event, this._mode);
+    this._eventEditComponent = new NewEvent(event, this._mode, this._pointsModel);
 
     this._currentEvent.setEditButtonClickHandler(() => {
       this._replaceEventToEdit();
@@ -52,14 +106,16 @@ export default class PointController {
     });
 
     this._eventEditComponent.setFavoriteBtnHandler(() => {
-      this._onDataChange(this, event, Object.assign({}, event, {
-        isFavorite: !event.isFavorite,
-      }), true);
+      const newPoint = Point.clone(event);
+      newPoint.isFavorite = !newPoint.isFavorite;
+      this._onDataChange(this, event, newPoint);
     });
 
     this._eventEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      const data = this._eventEditComponent.getData();
+      const formData = this._eventEditComponent.getData();
+      const data = parseFormData(formData, this._destinations, this._offersByType, event);
+
       if (mode === Mode.ADDING) {
         this._onDataChange(this, event, data, false, this._button);
       } else {

@@ -1,12 +1,10 @@
 import {
   checkSuffix,
-  formatDate, formatDateToDefault,
-  formatTime, formatString, parseDestinationInfo
+  formatDate, formatTime, formatString, formatOfferTitleToId,
 } from "../utils/common";
-import {TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix, EventTypeOffers} from "../const";
+import {TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix} from "../const";
 import {Mode} from "../controllers/point";
 import AbstractSmartComponent from "./abstract-smart-component";
-import {destinations} from "../mock/event";
 import flatpickr from "flatpickr";
 import {encode} from "he";
 
@@ -14,7 +12,7 @@ import "flatpickr/dist/flatpickr.min.css";
 
 const createNewEventTemplate = (newEvent, options = {}) => {
   const {time, price: notSanitizedPrice, isFavorite} = newEvent;
-  const {type, offers, destination, mode} = options;
+  const {type, offers, destination, mode, destinations} = options;
   const {description, photos, currentCity: notSanitizedCurrentCity} = destination;
   const {eventStartTime, eventEndTime} = time;
 
@@ -23,7 +21,7 @@ const createNewEventTemplate = (newEvent, options = {}) => {
 
   const renderPhotosMarkup = () => {
     return photos.map((photo) => {
-      return (`<img class="event__photo" src="${photo}" alt="Event photo">`);
+      return (`<img class="event__photo" src="${photo.src}" alt="${photo.description}">`);
     }).join(`\n`);
   };
 
@@ -104,7 +102,7 @@ const createNewEventTemplate = (newEvent, options = {}) => {
   };
 
   return (
-    `<form class="trip-events__item  event  event--edit" action="#" method="post">
+    `<li><form class="trip-events__item  event  event--edit" action="#" method="post">
             <header class="event__header">
               <div class="event__type-wrapper">
                 <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -166,56 +164,17 @@ const createNewEventTemplate = (newEvent, options = {}) => {
               ${checkOffers()}
               ${renderDestinationDescriptionMarkup()}
             </section>
-          </form>`
+          </form></li>`
   );
 };
 
-const parseFormData = (formData) => {
-  const choosenType = formatString(formData.get(`event-type`));
-
-  const reduseDefaultOffers = EventTypeOffers[formData.get(`event-type`)]
-    .reduce((acc, offer) => {
-      acc[offer.id] = false;
-      return acc;
-    }, {});
-
-  const reduseChoosenOffers = formData.getAll(`event-offer`).reduce((acc, offer) => {
-    acc[offer] = true;
-    return acc;
-  }, reduseDefaultOffers);
-
-  const formatChoosenOffers = () => {
-    let offers = [];
-    EventTypeOffers[formData.get(`event-type`)].forEach((offer) => {
-      for (const offerId in reduseChoosenOffers) {
-        if (offer.id === offerId) {
-          offers.push(Object.assign({}, offer, {
-            id: offerId,
-            required: reduseChoosenOffers[offerId]
-          }));
-        }
-      }
-    });
-    return offers;
-  };
-
-  return {
-    type: choosenType,
-    destination: parseDestinationInfo(destinations, formData.get(`event-destination`)),
-    time: {
-      eventStartTime: formatDateToDefault(formData.get(`event-start-time`)),
-      eventEndTime: formatDateToDefault(formData.get(`event-end-time`)),
-    },
-    price: formData.get(`event-price`),
-    isFavorite: !!formData.get(`event-favorite`),
-    offers: formatChoosenOffers()
-  };
-};
-
 export default class NewEvent extends AbstractSmartComponent {
-  constructor(event, mode) {
+  constructor(event, mode, pointsModel) {
     super();
 
+    this._pointsModel = pointsModel;
+    this._offersByType = this._pointsModel.getOffersByType();
+    this._destinations = this._pointsModel.getDestinations();
     this._mode = mode;
     this._event = event;
     this._eventType = event.type;
@@ -235,7 +194,8 @@ export default class NewEvent extends AbstractSmartComponent {
       type: this._eventType,
       offers: this._eventOffers,
       destination: this._eventDestination,
-      mode: this._mode
+      mode: this._mode,
+      destinations: this._destinations
     });
   }
 
@@ -262,14 +222,12 @@ export default class NewEvent extends AbstractSmartComponent {
   }
 
   getData() {
-    const form = this.getElement();
-    const formData = new FormData(form);
-
-    return parseFormData(formData);
+    const form = this.getElement().querySelector(`form`);
+    return new FormData(form);
   }
 
   setSubmitHandler(handler) {
-    this.getElement().addEventListener(`submit`, handler);
+    this.getElement().querySelector(`form`).addEventListener(`submit`, handler);
     this._submitHandler = handler;
   }
 
@@ -314,7 +272,7 @@ export default class NewEvent extends AbstractSmartComponent {
   }
 
   _subscribeOnEvents() {
-    const element = this.getElement();
+    const element = this.getElement().querySelector(`form`);
 
     const eventTypeList = element.querySelector(`.event__type-list`);
     const eventDestination = element.querySelector(`#event-destination-1`);
@@ -323,26 +281,31 @@ export default class NewEvent extends AbstractSmartComponent {
     eventTypeList.addEventListener(`change`, (evt) => {
       evt.preventDefault();
       this._eventType = evt.target.value;
-      this._eventOffers = EventTypeOffers[evt.target.value].map((offer) => {
-        return Object.assign({}, offer);
+      this._eventOffers = this._offersByType.get(evt.target.value).map((offer) => {
+        return Object.assign({}, offer, {
+          id: formatOfferTitleToId(offer.title),
+          required: false
+        });
       });
       this.rerender();
     });
 
     eventDestination.addEventListener(`change`, (evt) => {
       evt.preventDefault();
-      const index = destinations.findIndex((destination) => destination.currentCity === evt.target.value);
+      const index = this._destinations.findIndex((destination) => destination.currentCity === evt.target.value);
       if (index === -1) {
         eventDestination.setCustomValidity(`Выберете город из списка`);
         return;
       }
-      this._eventDestination = destinations[index];
+      this._eventDestination = this._destinations[index];
       this.rerender();
     });
 
-    eventOffersList.addEventListener(`change`, (evt) => {
-      const offer = element.querySelector(`#event-offer-${evt.target.value}-1`);
-      offer.toggleAttribute(`checked`);
-    });
+    if (eventOffersList) {
+      eventOffersList.addEventListener(`change`, (evt) => {
+        const offer = element.querySelector(`#event-offer-${evt.target.value}-1`);
+        offer.toggleAttribute(`checked`);
+      });
+    }
   }
 }

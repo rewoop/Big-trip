@@ -1,16 +1,20 @@
+import API from "./api";
 import TripInfo from "./components/trip-info";
 import Menu, {MenuItem} from "./components/menu";
 import StatisticsComponent from "./components/statistics";
 import FilterController from "./controllers/filter";
-import {generateTripEvents} from "./mock/event";
 import {render, RenderPosition} from "./utils/render";
 import TripController from "./controllers/trip";
 import Points from "./models/points";
+import LoadingComponent from "./components/loading-events";
+import {removeComponent} from "./utils/common";
 
-const TRIP_DAYS_COUNT = 22;
-const tripEvents = generateTripEvents(TRIP_DAYS_COUNT);
+const AUTHORIZATION = `Basic Llan­fair­pwll­gwyn­gyll­go­ge­rych­wyrn­dro­bwll­llan­ty­si­lio­go­go­goch`;
+const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
+
+const api = new API(END_POINT, AUTHORIZATION);
 const pointsModel = new Points();
-pointsModel.setPoints(tripEvents);
+const loadingComponent = new LoadingComponent();
 
 const siteHeader = document.querySelector(`.trip-main`);
 const siteMain = document.querySelector(`.page-main`);
@@ -22,41 +26,48 @@ const siteMenu = new Menu();
 
 render(siteHeader, new TripInfo(), RenderPosition.AFTERBEGIN);
 render(siteNavigationMenuHeader, siteMenu, RenderPosition.AFTEREND);
+render(siteTripEvents, loadingComponent);
 
 const filterController = new FilterController(siteNavigationMenu, pointsModel);
 filterController.render();
 
-const tripController = new TripController(siteTripEvents, pointsModel);
-tripController.renderTripList();
+const tripController = new TripController(siteTripEvents, pointsModel, api);
+api.getData()
+  .then((data) => {
+    pointsModel.setPoints(data.events);
+    pointsModel.setOffersByType(data.offers);
+    pointsModel.setDestinations(data.destinations);
+    removeComponent(loadingComponent);
+    tripController.renderTripList();
+  });
 
 newEventButton.addEventListener(`click`, (evt) => {
   evt.preventDefault();
-  filterController.setDefaultView();
+  filterController.setDefaultView(true);
   tripController.createPoint(newEventButton);
 });
 
-// const dateTo = new Date();
-// const dateFrom = (() => {
-//   const d = new Date(dateTo);
-//   d.setDate(d.getDate() - 7);
-//   return d;
-// })();
 const statisticsComponent = new StatisticsComponent({points: pointsModel});
 render(siteTripEvents, statisticsComponent, RenderPosition.AFTEREND);
 statisticsComponent.hide();
 
 siteMenu.setOnChange((menuItem) => {
+  const setCurrentView = (menu, oldElement, newElement) => {
+    siteMenu.setActiveItem(menu);
+    filterController.setDefaultView(menu);
+    oldElement.hide();
+    newElement.show();
+  };
+
   switch (menuItem) {
     case MenuItem.TABLE:
-      siteMenu.setActiveItem(MenuItem.TABLE);
-      statisticsComponent.hide();
-      tripController.show();
+      setCurrentView(MenuItem.TABLE, statisticsComponent, tripController);
+      newEventButton.removeAttribute(`disabled`);
       break;
     case MenuItem.STATISTICS:
-      siteMenu.setActiveItem(MenuItem.STATISTICS);
-      filterController.setDefaultView();
-      tripController.hide();
-      statisticsComponent.show();
+      setCurrentView(MenuItem.STATISTICS, tripController, statisticsComponent);
+      newEventButton.setAttribute(`disabled`, `disabled`);
       break;
   }
 });
+

@@ -2,10 +2,9 @@ import AbstractSmartComponent from "./abstract-smart-component";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {getDurationDate} from "../utils/common";
+import {IconMap} from "../const";
 
 const BAR_HEIGHT = 55;
-const ICON_SIZE = 20;
-const ICON_PADDING = ICON_SIZE;
 
 const getUniqItems = (item, index, array) => {
   return array.indexOf(item) === index;
@@ -19,7 +18,7 @@ const calcUniqItemsPrice = (points, type) => {
   let priceSum = 0;
   const pointsCosts = points.reduce((acc, point) => {
     if (point.type.toUpperCase() === type) {
-      priceSum += point.price;
+      priceSum += parseInt(point.price, 10);
       acc[point.type.toUpperCase()] = priceSum;
     }
     return acc;
@@ -44,35 +43,6 @@ const getPointsType = (points) => {
   return points.map((point) => point.type.toUpperCase()).filter(getUniqItems);
 };
 
-const chartCallback = (animation) => {
-  const chart = animation.chart;
-  const axisY = chart.scales[`y-axis-0`];
-  const ticks = axisY.ticks;
-  const fontSize = axisY.options.ticks.fontSize;
-
-  if (axisY.getPixelForTick(ticks.length - 1)) {
-    ticks.forEach((tick, idx) => {
-
-      const onLoadImage = (evt) => {
-        const textParams = chart.ctx.font;
-        chart.ctx.font = `normal ${fontSize}px sans-serif`;
-        const tickWidth = chart.ctx.measureText(tick).width;
-        chart.ctx.font = textParams;
-
-        const tickY = axisY.getPixelForTick(idx) - fontSize;
-        const tickX = axisY.right - tickWidth - ICON_SIZE - ICON_PADDING;
-
-        chart.ctx.drawImage(evt.target, tickX, tickY, ICON_SIZE, ICON_SIZE);
-        evt.target.removeEventListener(`load`, onLoadImage);
-      };
-
-      const tickIcon = new Image();
-      tickIcon.addEventListener(`load`, onLoadImage);
-      tickIcon.src = `img/icons/${tick.toLowerCase()}.png`;
-    });
-  }
-};
-
 const renderMoneyChart = (moneyCtx, points) => {
   const pointTypes = getPointsType(points);
   const pointsCosts = pointTypes.map((type) => calcUniqItemsPrice(points, type));
@@ -92,7 +62,6 @@ const renderMoneyChart = (moneyCtx, points) => {
       }]
     },
     options: {
-      events: [`click`],
       plugins: {
         datalabels: {
           font: {
@@ -117,6 +86,9 @@ const renderMoneyChart = (moneyCtx, points) => {
             fontColor: `#000000`,
             padding: 5,
             fontSize: 13,
+            callback: (type) => {
+              return `${IconMap[type.toLowerCase()]} ${type.toUpperCase()}`;
+            }
           },
           gridLines: {
             display: false,
@@ -139,9 +111,6 @@ const renderMoneyChart = (moneyCtx, points) => {
       },
       tooltips: {
         enabled: false,
-      },
-      animation: {
-        onProgress: chartCallback
       }
     }
   });
@@ -166,7 +135,6 @@ const renderTransportChart = (transportCtx, points) => {
       }]
     },
     options: {
-      events: [`click`],
       plugins: {
         datalabels: {
           font: {
@@ -191,6 +159,9 @@ const renderTransportChart = (transportCtx, points) => {
             fontColor: `#000000`,
             padding: 5,
             fontSize: 13,
+            callback: (type) => {
+              return `${IconMap[type.toLowerCase()]} ${type.toUpperCase()}`;
+            }
           },
           gridLines: {
             display: false,
@@ -213,9 +184,6 @@ const renderTransportChart = (transportCtx, points) => {
       },
       tooltips: {
         enabled: false,
-      },
-      animation: {
-        onProgress: chartCallback
       }
     }
   });
@@ -240,7 +208,6 @@ const renderTimeSpentChart = (timeSpentCtx, points) => {
       }]
     },
     options: {
-      events: [`click`],
       plugins: {
         datalabels: {
           font: {
@@ -265,6 +232,9 @@ const renderTimeSpentChart = (timeSpentCtx, points) => {
             fontColor: `#000000`,
             padding: 5,
             fontSize: 13,
+            callback: (type) => {
+              return `${IconMap[type.toLowerCase()]} ${type.toUpperCase()}`;
+            }
           },
           gridLines: {
             display: false,
@@ -287,9 +257,6 @@ const renderTimeSpentChart = (timeSpentCtx, points) => {
       },
       tooltips: {
         enabled: false,
-      },
-      animation: {
-        onProgress: chartCallback
       }
     }
   });
@@ -321,8 +288,9 @@ export default class StatisticsComponent extends AbstractSmartComponent {
 
     this._points = points;
 
-    this._daysChart = null;
-    this._colorsChart = null;
+    this._moneyChart = null;
+    this._transportChart = null;
+    this._timeSpentChart = null;
 
     this._renderCharts();
   }

@@ -1,27 +1,5 @@
 import moment from "moment";
 
-const HALF_OF_RANDOM = 0.5;
-
-const getRandomItem = (items) => {
-  const randomIndex = getRandomIntegerNumber(0, items.length);
-
-  return items[randomIndex];
-};
-
-const getRandomIntegerNumber = (min, max) => {
-  return min + Math.floor(Math.random() * (max - min));
-};
-
-const getRandomBoolean = () => Math.random() > HALF_OF_RANDOM;
-
-const shuffleItems = (items) => {
-  for (let i = items.length - 1; i > 0; i--) {
-    const j = getRandomIntegerNumber(1, i);
-    [items[i], items[j]] = [items[j], items[i]];
-  }
-  return items;
-};
-
 const checkSuffix = (label) => {
   const modernLabel = label.toUpperCase();
   return modernLabel === `CHECK-IN` ? `CHECK_IN` : modernLabel;
@@ -67,4 +45,23 @@ const parseDestinationInfo = (destinations, city) => {
   return index === -1 ? city : destinations[index];
 };
 
-export {getRandomItem, getRandomIntegerNumber, getRandomBoolean, shuffleItems, checkSuffix, formatTime, formatDate, getDurationDate, isFutureDate, isPastDate, formatDateToDefault, formatString, parseDestinationInfo};
+const formatOfferTitleToId = (string) => {
+  return string.replace(/\s+/g, `-`).toLowerCase();
+};
+
+const formatOffers = (offers) => {
+  return offers.map((offer) => {
+    return {
+      title: offer.title,
+      price: offer.price,
+      required: offer.required
+    };
+  });
+};
+
+const removeComponent = (component) => {
+  component.getElement().remove();
+  component.removeElement();
+};
+
+export {removeComponent, formatOffers, formatOfferTitleToId, checkSuffix, formatTime, formatDate, getDurationDate, isFutureDate, isPastDate, formatDateToDefault, formatString, parseDestinationInfo};
