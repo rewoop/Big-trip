@@ -10,14 +10,22 @@ import {encode} from "he";
 
 import "flatpickr/dist/flatpickr.min.css";
 
+const DefaultData = {
+  deleteButtonText: `Delete`,
+  saveButtonText: `Save`
+};
+
 const createNewEventTemplate = (newEvent, options = {}) => {
   const {time, price: notSanitizedPrice, isFavorite} = newEvent;
-  const {type, offers, destination, mode, destinations} = options;
+  const {type, offers, destination, mode, destinations, externalData} = options;
   const {description, photos, currentCity: notSanitizedCurrentCity} = destination;
   const {eventStartTime, eventEndTime} = time;
 
   const price = encode(notSanitizedPrice.toString());
   const currentCity = encode(notSanitizedCurrentCity);
+
+  const deleteButtonText = externalData.deleteButtonText;
+  const saveButtonText = externalData.saveButtonText;
 
   const renderPhotosMarkup = () => {
     return photos.map((photo) => {
@@ -90,7 +98,7 @@ const createNewEventTemplate = (newEvent, options = {}) => {
 
   const checkEventMode = () => {
     return mode !== Mode.ADDING ? (
-      `<button class="event__reset-btn" type="reset">Delete</button>
+      `<button class="event__reset-btn" type="reset">${deleteButtonText}</button>
       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
       <label class="event__favorite-btn" for="event-favorite-1">
       <span class="visually-hidden">Add to favorite</span>
@@ -154,7 +162,7 @@ const createNewEventTemplate = (newEvent, options = {}) => {
                 <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" pattern="^[0-9]+$" title="Разрешены только числовые значения">
               </div>
 
-              <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+              <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
               ${checkEventMode()}
               <button class="event__rollup-btn" type="button">
                 <span class="visually-hidden">Open event</span>
@@ -180,6 +188,7 @@ export default class NewEvent extends AbstractSmartComponent {
     this._eventType = event.type;
     this._eventOffers = event.offers.slice();
     this._eventDestination = Object.assign({}, event.destination);
+    this._externalData = DefaultData;
     this._submitHandler = null;
     this._favoriteBtnHandler = null;
     this._flatpickr = null;
@@ -195,7 +204,8 @@ export default class NewEvent extends AbstractSmartComponent {
       offers: this._eventOffers,
       destination: this._eventDestination,
       mode: this._mode,
-      destinations: this._destinations
+      destinations: this._destinations,
+      externalData: this._externalData
     });
   }
 
@@ -224,6 +234,29 @@ export default class NewEvent extends AbstractSmartComponent {
   getData() {
     const form = this.getElement().querySelector(`form`);
     return new FormData(form);
+  }
+
+  setData(data) {
+    this._externalData = Object.assign({}, DefaultData, data);
+    this.rerender();
+  }
+
+  setDisable() {
+    this.getElement().querySelectorAll(`input`)
+      .forEach((input) => input.setAttribute(`disabled`, `true`));
+  }
+
+  setRedBorder() {
+    this.getElement().querySelector(`form`).style.border = `2px solid red`;
+  }
+
+  removeRedBorder() {
+    this.getElement().querySelector(`form`).style.border = ``;
+  }
+
+  removeDisable() {
+    this.getElement().querySelectorAll(`input`)
+      .forEach((input) => input.removeAttribute(`disabled`));
   }
 
   setSubmitHandler(handler) {

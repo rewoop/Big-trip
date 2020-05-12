@@ -3,6 +3,7 @@ import NewEvent from "../components/new-event";
 import {replace, remove} from "../utils/render";
 import {formatDateToDefault, formatString, parseDestinationInfo} from "../utils/common";
 import Point from "../models/point";
+import {SHAKE_ANIMATION_TIMEOUT} from "../const";
 
 export const Mode = {
   ADDING: `adding`,
@@ -106,6 +107,7 @@ export default class PointController {
     });
 
     this._eventEditComponent.setFavoriteBtnHandler(() => {
+      this._eventEditComponent.removeRedBorder();
       const newPoint = Point.clone(event);
       newPoint.isFavorite = !newPoint.isFavorite;
       this._onDataChange(this, event, newPoint);
@@ -116,6 +118,12 @@ export default class PointController {
       const formData = this._eventEditComponent.getData();
       const data = parseFormData(formData, this._destinations, this._offersByType, event);
 
+      this._eventEditComponent.setData({
+        saveButtonText: `Saving...`,
+      });
+      this._eventEditComponent.setDisable();
+      this._eventEditComponent.removeRedBorder();
+
       if (mode === Mode.ADDING) {
         this._onDataChange(this, event, data, false, this._button);
       } else {
@@ -125,6 +133,11 @@ export default class PointController {
     });
 
     this._eventEditComponent.setDeleteButtonClickHandler(() => {
+      this._eventEditComponent.setData({
+        deleteButtonText: `Deleting...`
+      });
+      this._eventEditComponent.setDisable();
+      this._eventEditComponent.removeRedBorder();
       return mode === Mode.ADDING ? this._onDataChange(this, event, null, false, this._button) : this._onDataChange(this, event, null);
     });
 
@@ -156,6 +169,24 @@ export default class PointController {
     remove(this._eventEditComponent);
     remove(this._currentEvent);
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
+
+  shake() {
+    this._eventEditComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._currentEvent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._eventEditComponent.getElement().style.animation = ``;
+      this._currentEvent.getElement().style.animation = ``;
+      this._eventEditComponent.removeDisable();
+
+      this._eventEditComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`,
+      });
+    }, SHAKE_ANIMATION_TIMEOUT);
+
+    setTimeout(() => this._eventEditComponent.setRedBorder(), SHAKE_ANIMATION_TIMEOUT);
   }
 
   _replaceEventToEdit() {

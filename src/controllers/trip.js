@@ -149,17 +149,29 @@ export default class TripController {
           newEventBtn.removeAttribute(`disabled`);
         }
       } else {
-        this._pointsModel.addPoint(newData);
-        pointController.render(newData, PointControllerMode.DEFAULT);
-        this._updatePoints();
-        if (newEventBtn) {
-          newEventBtn.removeAttribute(`disabled`);
-          this._sort.removeDisabled();
-        }
+        this._api.createPoint(newData)
+          .then((pointModel) => {
+            this._pointsModel.addPoint(pointModel);
+            pointController.render(pointModel, PointControllerMode.DEFAULT);
+            this._updatePoints();
+            if (newEventBtn) {
+              newEventBtn.removeAttribute(`disabled`);
+              this._sort.removeDisabled();
+            }
+          })
+          .catch(() => {
+            pointController.shake();
+          });
       }
     } else if (newData === null) {
-      this._pointsModel.removePoint(oldData.id);
-      this._updatePoints();
+      this._api.deletePoint(oldData.id)
+        .then(() => {
+          this._pointsModel.removePoint(oldData.id);
+          this._updatePoints();
+        })
+        .catch(() => {
+          pointController.shake();
+        });
     } else {
       this._api.updatePoint(oldData.id, newData)
         .then((pointModel) => {
@@ -168,6 +180,9 @@ export default class TripController {
           if (isSuccess && !isFavBtnHandler) {
             pointController.render(pointModel, PointControllerMode.DEFAULT);
           }
+        })
+        .catch(() => {
+          pointController.shake();
         });
     }
   }
