@@ -165,7 +165,6 @@ export default class PointController {
     }
   }
 
-
   destroy() {
     remove(this._eventEditComponent);
     remove(this._currentEvent);

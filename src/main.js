@@ -1,4 +1,6 @@
-import API from "./api";
+import API from "./api/index";
+import Provider from "./api/provider";
+import Store from "./api/store.js";
 import TripInfo from "./components/trip-info";
 import Menu, {MenuItem} from "./components/menu";
 import StatisticsComponent from "./components/statistics";
@@ -9,10 +11,15 @@ import Points from "./models/points";
 import LoadingComponent from "./components/loading-events";
 import {removeComponent} from "./utils/common";
 
-const AUTHORIZATION = `Basic Llan­fair­pwll­gwyn­gyll­go­ge­rych­wyrn­dro­bwll­llan­ty­si­lio­go­go­goch`;
+const AUTHORIZATION = `Basic Llan­fair­pwll­gwyn­gyll­go­ge­rych­wyrn­dro­bwll­lan­ty­si­lio­go­go­goch`;
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
+const STORE_PREFIX = `big-trip-localstorage`;
+const STORE_VER = `v1`;
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const api = new API(END_POINT, AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 const pointsModel = new Points();
 const loadingComponent = new LoadingComponent();
 
@@ -31,8 +38,8 @@ render(siteTripEvents, loadingComponent);
 const filterController = new FilterController(siteNavigationMenu, pointsModel);
 filterController.render();
 
-const tripController = new TripController(siteTripEvents, pointsModel, api);
-api.getData()
+const tripController = new TripController(siteTripEvents, pointsModel, apiWithProvider);
+apiWithProvider.getData()
   .then((data) => {
     pointsModel.setPoints(data.events);
     pointsModel.setOffersByType(data.offers);
@@ -69,5 +76,21 @@ siteMenu.setOnChange((menuItem) => {
       newEventButton.setAttribute(`disabled`, `disabled`);
       break;
   }
+});
+
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`./sw.js`)
+    .then(() => {})
+    .catch(() => {});
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+
+  apiWithProvider.sync();
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
 });
 
