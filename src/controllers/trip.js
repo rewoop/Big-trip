@@ -42,8 +42,9 @@ const getSortedEvents = (events, sortType) => {
 };
 
 export default class TripController {
-  constructor(container, pointsModel, api) {
+  constructor(container, filterController, pointsModel, api) {
     this._container = container;
+    this._filterController = filterController;
     this._pointsModel = pointsModel;
     this._api = api;
 
@@ -136,6 +137,9 @@ export default class TripController {
     } else {
       removeComponent(this._noTripDays);
       this.renderEvents(this._tripList.getElement(), this._pointsModel.getPoints());
+      if (this._pointsModel.getPoints().length === 0) {
+        this._filterController.disableEmptyFilter(this._pointsModel.getActiveFilterType());
+      }
     }
   }
 

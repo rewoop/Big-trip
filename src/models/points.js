@@ -12,6 +12,10 @@ export default class Points {
     this._filterChangeHandlers = [];
   }
 
+  getActiveFilterType() {
+    return this._activeFilterType;
+  }
+
   getPoints() {
     return getPointsByFilter(this._points, this._activeFilterType);
   }

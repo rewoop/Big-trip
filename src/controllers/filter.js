@@ -44,6 +44,10 @@ export default class FilterController {
     return menuItem === MenuItem.STATISTICS ? this._filterComponent.setDisableInputs() : this._filterComponent.removeDisableInputs();
   }
 
+  disableEmptyFilter(currentFilter) {
+    this._filterComponent.disableEmptyFilter(currentFilter);
+  }
+
   _onFilterChange(filterType) {
     this._pointsModel.setFilter(filterType);
     this._activeFilterType = filterType;

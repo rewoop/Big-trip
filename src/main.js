@@ -10,8 +10,10 @@ import TripController from "./controllers/trip";
 import Points from "./models/points";
 import LoadingComponent from "./components/loading-events";
 import {removeComponent} from "./utils/common";
+import {FilterType as filters} from "./const";
+import {getPointsByFilter} from "./utils/filter";
 
-const AUTHORIZATION = `Basic Llan­fair­pwll­gwyn­gyll­go­ge­rych­wyrn­dro­bwll­lan­ty­si­lio­go­go­goch`;
+const AUTHORIZATION = `Basic Llan­fair­pwll­gwyn­gyll­go­ge­rych­rn­dro­bwlll­lan­ty­si­lio­go­go­goch`;
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
 const STORE_PREFIX = `big-trip-localstorage`;
 const STORE_VER = `v1`;
@@ -30,23 +32,35 @@ const siteNavigationMenuHeader = siteNavigationMenu.querySelector(`h2`);
 const siteTripEvents = siteMain.querySelector(`.trip-events`);
 const newEventButton = document.querySelector(`.trip-main__event-add-btn`);
 const siteMenu = new Menu();
+const tripInfo = new TripInfo(pointsModel);
 
-render(siteHeader, new TripInfo(), RenderPosition.AFTERBEGIN);
+render(siteHeader, tripInfo, RenderPosition.AFTERBEGIN);
 render(siteNavigationMenuHeader, siteMenu, RenderPosition.AFTEREND);
 render(siteTripEvents, loadingComponent);
 
 const filterController = new FilterController(siteNavigationMenu, pointsModel);
-filterController.render();
 
-const tripController = new TripController(siteTripEvents, pointsModel, apiWithProvider);
+const tripController = new TripController(siteTripEvents, filterController, pointsModel, apiWithProvider);
 apiWithProvider.getData()
   .then((data) => {
     pointsModel.setPoints(data.events);
     pointsModel.setOffersByType(data.offers);
     pointsModel.setDestinations(data.destinations);
     removeComponent(loadingComponent);
+    Object.values(filters).map((filter) => {
+      const filteredPoints = getPointsByFilter(pointsModel.getPointsAll(), filter.toLowerCase());
+      if (filteredPoints.length === 0) {
+        return filterController.disableEmptyFilter(filter.toLowerCase());
+      }
+      return filterController.render();
+    });
     tripController.renderTripList();
   });
+
+pointsModel.setDataChangeHandler(() => {
+  removeComponent(tripInfo);
+  render(siteHeader, tripInfo, RenderPosition.AFTERBEGIN);
+});
 
 newEventButton.addEventListener(`click`, (evt) => {
   evt.preventDefault();
@@ -79,7 +93,7 @@ siteMenu.setOnChange((menuItem) => {
 });
 
 window.addEventListener(`load`, () => {
-  navigator.serviceWorker.register(`./sw.js`)
+  navigator.serviceWorker.register(`/sw.js`)
     .then(() => {})
     .catch(() => {});
 });

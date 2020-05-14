@@ -40,9 +40,13 @@ export default class FilterComponent extends AbstractComponent {
     return createFilterTemplate(this._filters);
   }
 
+  disableEmptyFilter(currentFilter) {
+    this.getElement().querySelector(`#filter-${currentFilter}`).setAttribute(`disabled`, `true`);
+  }
+
   setDisableInputs() {
     this.getElement().querySelectorAll(`.trip-filters__filter-input`)
-      .forEach((input) => input.setAttribute(`disabled`, `disabled`));
+      .forEach((input) => input.setAttribute(`disabled`, `true`));
   }
 
   removeDisableInputs() {
