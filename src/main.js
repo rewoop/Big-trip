@@ -13,7 +13,7 @@ import {removeComponent} from "./utils/common";
 import {FilterType as filters} from "./const";
 import {getPointsByFilter} from "./utils/filter";
 
-const AUTHORIZATION = `Basic Llan­fair­pwll­gwyn­gyll­go­ge­rych­rn­dro­bwlll­lan­ty­si­lio­go­go­goch`;
+const AUTHORIZATION = `Basic Llan­fair­pwll­gwyn­gyll­go­ge­rych­rnro­bwlll­lan­ty­si­lio­go­go­goch`;
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
 const STORE_PREFIX = `big-trip-localstorage`;
 const STORE_VER = `v1`;
