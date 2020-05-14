@@ -11,7 +11,7 @@ import Points from "./models/points";
 import LoadingComponent from "./components/loading-events";
 import {removeComponent} from "./utils/common";
 
-const AUTHORIZATION = `Basic Llan­fair­pwll­gwyn­gyll­go­ge­rych­wyrn­dro­bwll­llan­ty­si­lio­go­go­goch`;
+const AUTHORIZATION = `Basic Llan­fair­pwll­gwyn­gyll­go­ge­rych­wyrn­dro­bwll­lan­ty­si­lio­go­go­goch`;
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
 const STORE_PREFIX = `big-trip-localstorage`;
 const STORE_VER = `v1`;
@@ -76,6 +76,12 @@ siteMenu.setOnChange((menuItem) => {
       newEventButton.setAttribute(`disabled`, `disabled`);
       break;
   }
+});
+
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`./sw.js`)
+    .then(() => {})
+    .catch(() => {});
 });
 
 window.addEventListener(`online`, () => {
