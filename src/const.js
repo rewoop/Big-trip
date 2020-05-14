@@ -6,6 +6,21 @@ const FIRST_DAY_COUNTER = 1;
 const SHAKE_ANIMATION_TIMEOUT = 600;
 const HIDDEN_CLASS = `visually-hidden`;
 
+const monthMap = new Map([
+  [0, `JAN`],
+  [1, `FEB`],
+  [2, `MAR`],
+  [3, `APR`],
+  [4, `MAY`],
+  [5, `JUN`],
+  [6, `JUL`],
+  [7, `AUG`],
+  [8, `SEP`],
+  [9, `OCT`],
+  [10, `NOV`],
+  [11, `DEC`],
+]);
+
 const EventType = {
   TAXI: `Taxi`,
   BUS: `Bus`,
@@ -53,4 +68,4 @@ const FilterType = {
   PAST: `past`
 };
 
-export {HIDDEN_CLASS, EVENT_TYPES, EventSuffix, TRANSFER_EVENTS, ACTIVITY_EVENTS, MAX_ISO_STRING_LENGTH, MAX_SHOWING_OFFERS, FIRST_DAY_COUNTER, FilterType, IconMap, SHAKE_ANIMATION_TIMEOUT};
+export {HIDDEN_CLASS, monthMap, EVENT_TYPES, EventSuffix, TRANSFER_EVENTS, ACTIVITY_EVENTS, MAX_ISO_STRING_LENGTH, MAX_SHOWING_OFFERS, FIRST_DAY_COUNTER, FilterType, IconMap, SHAKE_ANIMATION_TIMEOUT};
