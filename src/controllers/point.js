@@ -3,13 +3,7 @@ import NewEvent from "../components/new-event";
 import {replace, remove} from "../utils/render";
 import {formatDateToDefault, formatString, parseDestinationInfo} from "../utils/common";
 import Point from "../models/point";
-import {SHAKE_ANIMATION_TIMEOUT} from "../const";
-
-export const Mode = {
-  ADDING: `adding`,
-  DEFAULT: `default`,
-  EDIT: `edit`
-};
+import {SHAKE_ANIMATION_TIMEOUT, Mode} from "../const";
 
 export const EmptyPoint = {
   id: Math.random(),
@@ -104,6 +98,14 @@ export default class PointController {
     this._currentEvent.setEditButtonClickHandler(() => {
       this._replaceEventToEdit();
       document.addEventListener(`keydown`, this._onEscKeyDown);
+    });
+
+    this._eventEditComponent.setCloseButtonClickHandler(() => {
+      if (this._mode === Mode.ADDING) {
+        this._onDataChange(this, event, null, false, this._button);
+      }
+      this._replaceEditToEvent();
+      document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
 
     this._eventEditComponent.setFavoriteBtnHandler(() => {

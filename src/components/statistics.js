@@ -2,9 +2,7 @@ import AbstractSmartComponent from "./abstract-smart-component";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {getDurationDate} from "../utils/common";
-import {IconMap} from "../const";
-
-const BAR_HEIGHT = 55;
+import {iconMap, BAR_HEIGHT} from "../const";
 
 const getUniqItems = (item, index, array) => {
   return array.indexOf(item) === index;
@@ -87,7 +85,7 @@ const renderMoneyChart = (moneyCtx, points) => {
             padding: 5,
             fontSize: 13,
             callback: (type) => {
-              return `${IconMap[type.toLowerCase()]} ${type.toUpperCase()}`;
+              return `${iconMap[type.toLowerCase()]} ${type.toUpperCase()}`;
             }
           },
           gridLines: {
@@ -160,7 +158,7 @@ const renderTransportChart = (transportCtx, points) => {
             padding: 5,
             fontSize: 13,
             callback: (type) => {
-              return `${IconMap[type.toLowerCase()]} ${type.toUpperCase()}`;
+              return `${iconMap[type.toLowerCase()]} ${type.toUpperCase()}`;
             }
           },
           gridLines: {
@@ -233,7 +231,7 @@ const renderTimeSpentChart = (timeSpentCtx, points) => {
             padding: 5,
             fontSize: 13,
             callback: (type) => {
-              return `${IconMap[type.toLowerCase()]} ${type.toUpperCase()}`;
+              return `${iconMap[type.toLowerCase()]} ${type.toUpperCase()}`;
             }
           },
           gridLines: {

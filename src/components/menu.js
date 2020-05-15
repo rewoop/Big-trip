@@ -1,10 +1,5 @@
 import AbstractComponent from "./abstract-component";
 
-export const MenuItem = {
-  TABLE: `Table`,
-  STATISTICS: `Stats`
-};
-
 const createMenuTemplate = () => {
   return (
     `<nav class="trip-controls__trip-tabs  trip-tabs">

@@ -2,7 +2,7 @@ import API from "./api/index";
 import Provider from "./api/provider";
 import Store from "./api/store.js";
 import TripInfo from "./components/trip-info";
-import Menu, {MenuItem} from "./components/menu";
+import Menu from "./components/menu";
 import StatisticsComponent from "./components/statistics";
 import FilterController from "./controllers/filter";
 import {render, RenderPosition} from "./utils/render";
@@ -10,14 +10,8 @@ import TripController from "./controllers/trip";
 import Points from "./models/points";
 import LoadingComponent from "./components/loading-events";
 import {removeComponent} from "./utils/common";
-import {FilterType as filters} from "./const";
+import {FilterType as filters, MenuItem, AUTHORIZATION, END_POINT, STORE_NAME} from "./const";
 import {getPointsByFilter} from "./utils/filter";
-
-const AUTHORIZATION = `Basic Llan­fair­pwll­gwyn­gyll­go­ge­rych­rnro­bwlll­lan­ty­si­lio­go­go­goch`;
-const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
-const STORE_PREFIX = `big-trip-localstorage`;
-const STORE_VER = `v1`;
-const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const api = new API(END_POINT, AUTHORIZATION);
 const store = new Store(STORE_NAME, window.localStorage);
@@ -42,10 +36,10 @@ const filterController = new FilterController(siteNavigationMenu, pointsModel);
 
 const tripController = new TripController(siteTripEvents, filterController, pointsModel, apiWithProvider);
 apiWithProvider.getData()
-  .then((data) => {
-    pointsModel.setPoints(data.events);
-    pointsModel.setOffersByType(data.offers);
-    pointsModel.setDestinations(data.destinations);
+  .then((points) => {
+    pointsModel.setPoints(points.events);
+    pointsModel.setOffersByType(points.offers);
+    pointsModel.setDestinations(points.destinations);
     removeComponent(loadingComponent);
     Object.values(filters).map((filter) => {
       const filteredPoints = getPointsByFilter(pointsModel.getPointsAll(), filter.toLowerCase());
@@ -93,7 +87,7 @@ siteMenu.setOnChange((menuItem) => {
 });
 
 window.addEventListener(`load`, () => {
-  navigator.serviceWorker.register(`/sw.js`)
+  navigator.serviceWorker.register(`./sw.js`)
     .then(() => {})
     .catch(() => {});
 });

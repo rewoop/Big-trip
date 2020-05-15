@@ -1,25 +1,25 @@
 import {formatOfferTitleToId, formatString, formatOffers} from "../utils/common";
 
 export default class Point {
-  constructor(data) {
-    this.id = data[`id`];
-    this.type = formatString(data[`type`]);
+  constructor(point) {
+    this.id = point[`id`];
+    this.type = formatString(point[`type`]);
     this.time = {
-      eventStartTime: new Date(data[`date_from`]),
-      eventEndTime: new Date(data[`date_to`]),
+      eventStartTime: new Date(point[`date_from`]),
+      eventEndTime: new Date(point[`date_to`]),
     };
-    this.price = data[`base_price`];
-    this.offers = data[`offers`].map((offer) => {
+    this.price = point[`base_price`];
+    this.offers = point[`offers`].map((offer) => {
       return Object.assign({}, offer, {
         id: formatOfferTitleToId(offer.title)
       });
     });
     this.destination = {
-      description: data[`destination`][`description`],
-      photos: data[`destination`][`pictures`],
-      currentCity: data[`destination`][`name`]
+      description: point[`destination`][`description`],
+      photos: point[`destination`][`pictures`],
+      currentCity: point[`destination`][`name`]
     };
-    this.isFavorite = data[`is_favorite`];
+    this.isFavorite = point[`is_favorite`];
   }
 
   toRAW() {
@@ -39,15 +39,15 @@ export default class Point {
     };
   }
 
-  static parsePoint(data) {
-    return new Point(data);
+  static parsePoint(point) {
+    return new Point(point);
   }
 
-  static parsePoints(data) {
-    return data.map(Point.parsePoint);
+  static parsePoints(points) {
+    return points.map(Point.parsePoint);
   }
 
-  static clone(data) {
-    return new Point(data.toRAW());
+  static clone(point) {
+    return new Point(point.toRAW());
   }
 }

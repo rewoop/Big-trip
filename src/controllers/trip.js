@@ -1,10 +1,10 @@
 import {render, RenderPosition} from "../utils/render";
-import Sort, {SortType} from "../components/sort";
+import Sort from "../components/sort";
 import TripDay from "../components/trip-days";
 import NoTripDays from "../components/no-trip-days";
 import TripList from "../components/trip-list";
-import {FIRST_DAY_COUNTER, HIDDEN_CLASS} from "../const";
-import PointController, {Mode as PointControllerMode, EmptyPoint} from "./point";
+import {FIRST_DAY_COUNTER, HIDDEN_CLASS, Mode as PointControllerMode, SortType} from "../const";
+import PointController, {EmptyPoint} from "./point";
 import {removeComponent} from "../utils/common";
 
 const getSortedEvents = (events, sortType) => {

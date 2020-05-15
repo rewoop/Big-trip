@@ -1,10 +1,5 @@
 import AbstractSmartComponent from "./abstract-smart-component";
-
-export const SortType = {
-  EVENT: `sort-event`,
-  TIME: `sort-time`,
-  PRICE: `sort-price`,
-};
+import {SortType} from "../const";
 
 const createSortTemplate = (sortType, isDisabled = false) => {
   return (

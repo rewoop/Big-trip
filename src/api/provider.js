@@ -42,9 +42,9 @@ export default class Provider {
     return Promise.resolve(localNewPoint);
   }
 
-  updatePoint(id, data) {
+  updatePoint(id, point) {
     if (this._isOnline()) {
-      return this._api.updatePoint(id, data)
+      return this._api.updatePoint(id, point)
         .then((newPoint) => {
           this._store.setItem(newPoint.id, newPoint.toRAW());
 
@@ -52,7 +52,7 @@ export default class Provider {
         });
     }
 
-    const localPoint = Point.clone(Object.assign(data, {id}));
+    const localPoint = Point.clone(Object.assign(point, {id}));
 
     this._store.setItem(id, localPoint.toRAW());
 

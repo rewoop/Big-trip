@@ -1,5 +1,5 @@
 import AbstractComponent from "./abstract-component";
-import {SortType} from "./sort";
+import {SortType} from "../const";
 import {render} from "../utils/render";
 
 const createTripDaysTemplate = (day, index, sortType = SortType.EVENT) => {

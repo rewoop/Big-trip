@@ -1,19 +1,13 @@
 import {
   checkSuffix,
-  formatDate, formatTime, formatString, formatOfferTitleToId,
+  formatDate, formatTime, formatString, formatOfferTitleToId, formatDateToDefault
 } from "../utils/common";
-import {TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix} from "../const";
-import {Mode} from "../controllers/point";
+import {TRANSFER_EVENTS, ACTIVITY_EVENTS, EVENT_TYPES, EventSuffix, DefaultData, Mode} from "../const";
 import AbstractSmartComponent from "./abstract-smart-component";
 import flatpickr from "flatpickr";
 import {encode} from "he";
 
 import "flatpickr/dist/flatpickr.min.css";
-
-const DefaultData = {
-  deleteButtonText: `Delete`,
-  saveButtonText: `Save`
-};
 
 const createNewEventTemplate = (newEvent, options = {}) => {
   const {time, price: notSanitizedPrice, isFavorite} = newEvent;
@@ -159,13 +153,13 @@ const createNewEventTemplate = (newEvent, options = {}) => {
                   <span class="visually-hidden">Price</span>
                   &euro;
                 </label>
-                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" pattern="^[0-9]+$" title="Разрешены только числовые значения">
+                <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}" pattern="^[0-9]+$" title="Разрешены только числовые значения">
               </div>
 
               <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
               ${checkEventMode()}
               <button class="event__rollup-btn" type="button">
-                <span class="visually-hidden">Open event</span>
+                <span class="visually-hidden">Close event</span>
               </button>
             </header>
             <section class="event__details">
@@ -188,11 +182,14 @@ export default class NewEvent extends AbstractSmartComponent {
     this._eventType = event.type;
     this._eventOffers = event.offers.slice();
     this._eventDestination = Object.assign({}, event.destination);
+    this._eventStartDate = event.time.eventStartTime;
+    this._eventEndDate = event.time.eventEndTime;
     this._externalData = DefaultData;
     this._submitHandler = null;
     this._favoriteBtnHandler = null;
     this._flatpickr = null;
     this._deleteButtonClickHandler = null;
+    this._closeButtonClickHandler = null;
 
     this._applyFlatpickr();
     this._subscribeOnEvents();
@@ -222,6 +219,7 @@ export default class NewEvent extends AbstractSmartComponent {
     this.setSubmitHandler(this._submitHandler);
     this.setFavoriteBtnHandler(this._favoriteBtnHandler);
     this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
+    this.setCloseButtonClickHandler(this._closeButtonClickHandler);
     this._subscribeOnEvents();
   }
 
@@ -279,13 +277,19 @@ export default class NewEvent extends AbstractSmartComponent {
     this._deleteButtonClickHandler = handler;
   }
 
+  setCloseButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, handler);
+
+    this._closeButtonClickHandler = handler;
+  }
+
   setFlatpickr(dateElement, eventDate) {
     this._flatpickr = flatpickr(dateElement, {
       altInput: true,
       allowInput: true,
       enableTime: true,
-      // eslint-disable-next-line camelcase
-      time_24hr: true,
+      [`time_24hr`]: true,
       dateFormat: `d/m/Y H:i`,
       altFormat: `d/m/Y H:i`,
       defaultDate: eventDate,
@@ -310,6 +314,28 @@ export default class NewEvent extends AbstractSmartComponent {
     const eventTypeList = element.querySelector(`.event__type-list`);
     const eventDestination = element.querySelector(`#event-destination-1`);
     const eventOffersList = element.querySelector(`.event__available-offers`);
+    const startTime = element.querySelector(`#event-start-time-1`);
+    const endTime = element.querySelector(`#event-end-time-1`);
+    const validityEndTimeInput = element.querySelectorAll(`.event__input--time`)[3];
+
+    startTime.addEventListener(`change`, (evt) => {
+      this._eventStartDate = formatDateToDefault(evt.target.value);
+    });
+
+    endTime.addEventListener(`change`, (evt) => {
+      this._eventEndDate = formatDateToDefault(evt.target.value);
+    });
+
+    element.addEventListener(`click`, () => {
+      if (validityEndTimeInput) {
+        if (this._eventEndDate < this._eventStartDate) {
+          validityEndTimeInput.setCustomValidity(`Дата окончания не может быть меньше даты начала`);
+          validityEndTimeInput.reportValidity();
+        } else {
+          validityEndTimeInput.setCustomValidity(``);
+        }
+      }
+    });
 
     eventTypeList.addEventListener(`change`, (evt) => {
       evt.preventDefault();

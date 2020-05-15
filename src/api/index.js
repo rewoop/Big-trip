@@ -1,12 +1,6 @@
 import Point from "../models/point";
 import {formatOfferTitleToId} from "../utils/common";
-
-const Method = {
-  GET: `GET`,
-  POST: `POST`,
-  PUT: `PUT`,
-  DELETE: `DELETE`
-};
+import {Method} from "../const";
 
 const checkStatus = (response) => {
   if (response.status >= 200 && response.status < 300) {
@@ -89,11 +83,11 @@ const API = class {
       .then(Point.parsePoint);
   }
 
-  updatePoint(id, data) {
+  updatePoint(id, point) {
     return this._load({
       url: `points/${id}`,
       method: Method.PUT,
-      body: JSON.stringify(data.toRAW()),
+      body: JSON.stringify(point.toRAW()),
       headers: new Headers({"Content-Type": `application/json`})
     })
       .then((response) => response.json())
@@ -104,11 +98,11 @@ const API = class {
     return this._load({url: `points/${id}`, method: Method.DELETE});
   }
 
-  sync(data) {
+  sync(points) {
     return this._load({
       url: `points/sync`,
       method: Method.POST,
-      body: JSON.stringify(data),
+      body: JSON.stringify(points),
       headers: new Headers({"Content-Type": `application/json`})
     })
       .then((response) => response.json());

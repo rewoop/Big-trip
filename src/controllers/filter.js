@@ -1,7 +1,6 @@
 import FilterComponent from "../components/filter";
-import {FilterType} from "../const";
+import {FilterType, MenuItem} from "../const";
 import {render, replace} from "../utils/render";
-import {MenuItem} from "../components/menu";
 
 export default class FilterController {
   constructor(container, pointsModel) {
