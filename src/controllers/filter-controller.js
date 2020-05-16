@@ -1,4 +1,4 @@
-import FilterComponent from "../components/filter";
+import Filter from "../components/filter";
 import {FilterType, MenuItem} from "../const";
 import {render, replace} from "../utils/render";
 
@@ -26,7 +26,7 @@ export default class FilterController {
     });
     const oldComponent = this._filterComponent;
 
-    this._filterComponent = new FilterComponent(filters);
+    this._filterComponent = new Filter(filters);
     this._filterComponent.setFilterChangeHandler(this._onFilterChange);
 
     if (oldComponent) {
@@ -36,11 +36,16 @@ export default class FilterController {
     }
   }
 
-  setDefaultView(menuItem) {
+  setDefaultView(menuItem = MenuItem.TABLE) {
     this._pointsModel.setFilter(FilterType.EVERYTHING);
     this._activeFilterType = FilterType.EVERYTHING;
     this.render();
     return menuItem === MenuItem.STATISTICS ? this._filterComponent.setDisableInputs() : this._filterComponent.removeDisableInputs();
+  }
+
+  removeChecked() {
+    this._activeFilterType = null;
+    this.render();
   }
 
   disableEmptyFilter(currentFilter) {

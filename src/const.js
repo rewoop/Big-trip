@@ -7,11 +7,17 @@ const SHAKE_ANIMATION_TIMEOUT = 600;
 const HIDDEN_CLASS = `visually-hidden`;
 const FILTER_ID_PREFIX = `filter-`;
 const BAR_HEIGHT = 55;
-const AUTHORIZATION = `Basic Llan­fair­pwll­gwyn­gyll­go­ge­rych­rnro­bwlll­l­ty­si­lio­go­goch`;
+const AUTHORIZATION = `Basic Llan­fair­pwyn­gyll­go­ge­rych­rnro­bwlll­­si­lio­go­goch`;
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
 const STORE_PREFIX = `big-trip-localstorage`;
 const STORE_VER = `v1`;
 const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+const MIN_BAR_LENGTH = 50;
+const BAR_THICKNESS = 44;
+const DATALABELS_SIZE = 13;
+const TITLE_FONT_SIZE = 23;
+const TICKS_PADDING = 5;
+const TICKS_FONT_SIZE = 13;
 
 const monthMap = new Map([
   [0, `JAN`],
@@ -111,4 +117,4 @@ const RenderPosition = {
   AFTEREND: `afterend`
 };
 
-export {HIDDEN_CLASS, FILTER_ID_PREFIX, monthMap, EVENT_TYPES, EventSuffix, TRANSFER_EVENTS, ACTIVITY_EVENTS, MAX_ISO_STRING_LENGTH, MAX_SHOWING_OFFERS, FIRST_DAY_COUNTER, FilterType, iconMap, SHAKE_ANIMATION_TIMEOUT, DefaultData, Method, MenuItem, SortType, BAR_HEIGHT, Mode, RenderPosition, AUTHORIZATION, END_POINT, STORE_NAME};
+export {HIDDEN_CLASS, FILTER_ID_PREFIX, monthMap, EVENT_TYPES, EventSuffix, TRANSFER_EVENTS, ACTIVITY_EVENTS, MAX_ISO_STRING_LENGTH, MAX_SHOWING_OFFERS, FIRST_DAY_COUNTER, FilterType, iconMap, SHAKE_ANIMATION_TIMEOUT, DefaultData, Method, MenuItem, SortType, BAR_HEIGHT, Mode, RenderPosition, AUTHORIZATION, END_POINT, STORE_NAME, MIN_BAR_LENGTH, BAR_THICKNESS, DATALABELS_SIZE, TITLE_FONT_SIZE, TICKS_PADDING, TICKS_FONT_SIZE};

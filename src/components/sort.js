@@ -4,7 +4,7 @@ import {SortType} from "../const";
 const createSortTemplate = (sortType, isDisabled = false) => {
   return (
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-      <span class="trip-sort__item  trip-sort__item--day">Day</span>
+      ${sortType === SortType.EVENT ? `<span class="trip-sort__item  trip-sort__item--day">Day</span>` : `<span class="trip-sort__item  trip-sort__item--day"></span>`}
 
       <div class="trip-sort__item  trip-sort__item--event">
         <input id="${SortType.EVENT}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="${SortType.EVENT}" ${sortType === SortType.EVENT ? `checked` : ``} ${isDisabled ? `disabled` : ``}>
@@ -61,6 +61,11 @@ export default class Sort extends AbstractSmartComponent {
 
   removeDisabled() {
     this._isNewEventFormOpened = false;
+    this.rerender();
+  }
+
+  setCurrentSortType(sortType) {
+    this._currenSortType = sortType;
     this.rerender();
   }
 

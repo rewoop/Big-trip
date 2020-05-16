@@ -24,12 +24,12 @@ const getFullCost = (points) => {
     .map((offer) => {
       return offer.map((price) => price !== undefined ? price : 0)
         .reduce((acc, event) => acc + event);
-    })
-    .reduce((acc, event) => acc + event) : 0;
+    }) : [];
+  const allOffersSum = offersSum.length > 0 ? offersSum.reduce((acc, event) => acc + event) : 0;
   return points ? points
     .slice()
     .map((event) => event.price)
-    .reduce((acc, event) => acc + event) + offersSum : 0;
+    .reduce((acc, event) => acc + event) + allOffersSum : 0;
 };
 
 const getRoute = (points) => {

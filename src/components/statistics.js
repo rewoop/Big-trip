@@ -2,7 +2,7 @@ import AbstractSmartComponent from "./abstract-smart-component";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {getDurationDate} from "../utils/common";
-import {iconMap, BAR_HEIGHT} from "../const";
+import {iconMap, BAR_HEIGHT, MIN_BAR_LENGTH, BAR_THICKNESS, DATALABELS_SIZE, TITLE_FONT_SIZE, TICKS_PADDING, TICKS_FONT_SIZE} from "../const";
 
 const getUniqItems = (item, index, array) => {
   return array.indexOf(item) === index;
@@ -55,15 +55,15 @@ const renderMoneyChart = (moneyCtx, points) => {
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`,
-        minBarLength: 50,
-        barThickness: 44
+        minBarLength: MIN_BAR_LENGTH,
+        barThickness: BAR_THICKNESS
       }]
     },
     options: {
       plugins: {
         datalabels: {
           font: {
-            size: 13
+            size: DATALABELS_SIZE
           },
           color: `#000000`,
           anchor: `end`,
@@ -75,15 +75,15 @@ const renderMoneyChart = (moneyCtx, points) => {
         display: true,
         text: `MONEY`,
         fontColor: `#000000`,
-        fontSize: 23,
+        fontSize: TITLE_FONT_SIZE,
         position: `left`
       },
       scales: {
         yAxes: [{
           ticks: {
             fontColor: `#000000`,
-            padding: 5,
-            fontSize: 13,
+            padding: TICKS_PADDING,
+            fontSize: TICKS_FONT_SIZE,
             callback: (type) => {
               return `${iconMap[type.toLowerCase()]} ${type.toUpperCase()}`;
             }
@@ -128,15 +128,15 @@ const renderTransportChart = (transportCtx, points) => {
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`,
-        minBarLength: 50,
-        barThickness: 44
+        minBarLength: MIN_BAR_LENGTH,
+        barThickness: BAR_THICKNESS
       }]
     },
     options: {
       plugins: {
         datalabels: {
           font: {
-            size: 13
+            size: DATALABELS_SIZE
           },
           color: `#000000`,
           anchor: `end`,
@@ -148,15 +148,15 @@ const renderTransportChart = (transportCtx, points) => {
         display: true,
         text: `TRANSPORT`,
         fontColor: `#000000`,
-        fontSize: 23,
+        fontSize: TITLE_FONT_SIZE,
         position: `left`
       },
       scales: {
         yAxes: [{
           ticks: {
             fontColor: `#000000`,
-            padding: 5,
-            fontSize: 13,
+            padding: TICKS_PADDING,
+            fontSize: TICKS_FONT_SIZE,
             callback: (type) => {
               return `${iconMap[type.toLowerCase()]} ${type.toUpperCase()}`;
             }
@@ -201,15 +201,15 @@ const renderTimeSpentChart = (timeSpentCtx, points) => {
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`,
-        minBarLength: 50,
-        barThickness: 44
+        minBarLength: MIN_BAR_LENGTH,
+        barThickness: BAR_THICKNESS
       }]
     },
     options: {
       plugins: {
         datalabels: {
           font: {
-            size: 13
+            size: DATALABELS_SIZE
           },
           color: `#000000`,
           anchor: `end`,
@@ -221,15 +221,15 @@ const renderTimeSpentChart = (timeSpentCtx, points) => {
         display: true,
         text: `TIME SPENT`,
         fontColor: `#000000`,
-        fontSize: 23,
+        fontSize: TITLE_FONT_SIZE,
         position: `left`,
       },
       scales: {
         yAxes: [{
           ticks: {
             fontColor: `#000000`,
-            padding: 5,
-            fontSize: 13,
+            padding: TICKS_PADDING,
+            fontSize: TICKS_FONT_SIZE,
             callback: (type) => {
               return `${iconMap[type.toLowerCase()]} ${type.toUpperCase()}`;
             }
@@ -280,7 +280,7 @@ const createStatisticsTemplate = () => {
   );
 };
 
-export default class StatisticsComponent extends AbstractSmartComponent {
+export default class Statistics extends AbstractSmartComponent {
   constructor({points}) {
     super();
 

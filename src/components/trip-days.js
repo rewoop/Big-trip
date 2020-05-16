@@ -26,7 +26,7 @@ const createTripDaysTemplate = (day, index, sortType = SortType.EVENT) => {
   );
 };
 
-export default class TripDay extends AbstractComponent {
+export default class TripDays extends AbstractComponent {
   constructor(day, index, sortType) {
     super();
 

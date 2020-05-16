@@ -22,7 +22,7 @@ export default class Menu extends AbstractComponent {
     });
   }
 
-  setOnChange(handler) {
+  setOnTripTabsChange(handler) {
     this.getElement().querySelectorAll(`.trip-tabs__btn`).forEach((item) => {
       item.addEventListener(`click`, (evt) => {
         const menuItem = evt.target.innerHTML;

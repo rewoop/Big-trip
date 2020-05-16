@@ -1,23 +1,23 @@
-import API from "./api/index";
+import IndexApi from "./api/index-api";
 import Provider from "./api/provider";
 import Store from "./api/store.js";
 import TripInfo from "./components/trip-info";
 import Menu from "./components/menu";
-import StatisticsComponent from "./components/statistics";
-import FilterController from "./controllers/filter";
+import Statistics from "./components/statistics";
+import FilterController from "./controllers/filter-controller";
 import {render, RenderPosition} from "./utils/render";
-import TripController from "./controllers/trip";
+import TripController from "./controllers/trip-controller";
 import Points from "./models/points";
-import LoadingComponent from "./components/loading-events";
+import Loading from "./components/loading";
 import {removeComponent} from "./utils/common";
 import {FilterType as filters, MenuItem, AUTHORIZATION, END_POINT, STORE_NAME} from "./const";
 import {getPointsByFilter} from "./utils/filter";
 
-const api = new API(END_POINT, AUTHORIZATION);
+const api = new IndexApi(END_POINT, AUTHORIZATION);
 const store = new Store(STORE_NAME, window.localStorage);
 const apiWithProvider = new Provider(api, store);
 const pointsModel = new Points();
-const loadingComponent = new LoadingComponent();
+const loadingComponent = new Loading();
 
 const siteHeader = document.querySelector(`.trip-main`);
 const siteMain = document.querySelector(`.page-main`);
@@ -62,11 +62,11 @@ newEventButton.addEventListener(`click`, (evt) => {
   tripController.createPoint(newEventButton);
 });
 
-const statisticsComponent = new StatisticsComponent({points: pointsModel});
+const statisticsComponent = new Statistics({points: pointsModel});
 render(siteTripEvents, statisticsComponent, RenderPosition.AFTEREND);
 statisticsComponent.hide();
 
-siteMenu.setOnChange((menuItem) => {
+siteMenu.setOnTripTabsChange((menuItem) => {
   const setCurrentView = (menu, oldElement, newElement) => {
     siteMenu.setActiveItem(menu);
     filterController.setDefaultView(menu);

@@ -112,7 +112,6 @@ export default class PointController {
       this._eventEditComponent.removeRedBorder();
       const newPoint = Point.clone(event);
       newPoint.isFavorite = !newPoint.isFavorite;
-      this._onDataChange(this, event, newPoint);
     });
 
     this._eventEditComponent.setSubmitHandler((evt) => {
@@ -125,13 +124,9 @@ export default class PointController {
       });
       this._eventEditComponent.setDisable();
       this._eventEditComponent.removeRedBorder();
-
-      if (mode === Mode.ADDING) {
-        this._onDataChange(this, event, data, false, this._button);
-      } else {
-        this._onDataChange(this, event, data);
-      }
       document.removeEventListener(`keydown`, this._onEscKeyDown);
+
+      return mode === Mode.ADDING ? this._onDataChange(this, event, data, false, this._button) : this._onDataChange(this, event, data);
     });
 
     this._eventEditComponent.setDeleteButtonClickHandler(() => {
@@ -147,6 +142,8 @@ export default class PointController {
       if (oldEventEditComponent && oldEventComponent) {
         replace(this._currentEvent, oldEventComponent);
         replace(this._eventEditComponent, oldEventEditComponent);
+        remove(oldEventComponent);
+        remove(oldEventEditComponent);
         this._replaceEditToEvent();
       }
       return this._currentEvent;

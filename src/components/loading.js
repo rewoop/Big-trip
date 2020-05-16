@@ -6,7 +6,7 @@ const createLoadingEventsTemplate = () => {
   );
 };
 
-export default class LoadingComponent extends AbstractComponent {
+export default class Loading extends AbstractComponent {
   constructor() {
     super();
   }

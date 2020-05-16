@@ -10,7 +10,7 @@ const checkStatus = (response) => {
   }
 };
 
-const API = class {
+export default class IndexApi {
   constructor(endPoint, authorization) {
     this._endPoint = endPoint;
     this._authorization = authorization;
@@ -117,6 +117,4 @@ const API = class {
         throw err;
       });
   }
-};
-
-export default API;
+}

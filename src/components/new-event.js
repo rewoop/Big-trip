@@ -153,7 +153,7 @@ const createNewEventTemplate = (newEvent, options = {}) => {
                   <span class="visually-hidden">Price</span>
                   &euro;
                 </label>
-                <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}" pattern="^[0-9]+$" title="Разрешены только числовые значения">
+                <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}" pattern="^[0-9]+$" title="Разрешены только числовые значения" required>
               </div>
 
               <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
@@ -188,6 +188,8 @@ export default class NewEvent extends AbstractSmartComponent {
     this._submitHandler = null;
     this._favoriteBtnHandler = null;
     this._flatpickr = null;
+    this._flatpickrStartTime = null;
+    this._flatpickrEndTime = null;
     this._deleteButtonClickHandler = null;
     this._closeButtonClickHandler = null;
 
@@ -207,9 +209,13 @@ export default class NewEvent extends AbstractSmartComponent {
   }
 
   removeElement() {
-    if (this._flatpickr) {
-      this._flatpickr.destroy();
-      this._flatpickr = null;
+    if (this._flatpickrStartTime) {
+      this._flatpickrStartTime.destroy();
+      this._flatpickrStartTime = null;
+    }
+    if (this._flatpickrEndTime) {
+      this._flatpickrEndTime.destroy();
+      this._flatpickrEndTime = null;
     }
 
     super.removeElement();
@@ -242,6 +248,8 @@ export default class NewEvent extends AbstractSmartComponent {
   setDisable() {
     this.getElement().querySelectorAll(`input`)
       .forEach((input) => input.setAttribute(`disabled`, `true`));
+    this.getElement().querySelectorAll(`button`)
+      .forEach((btn) => btn.setAttribute(`disabled`, `true`));
   }
 
   setRedBorder() {
@@ -255,6 +263,8 @@ export default class NewEvent extends AbstractSmartComponent {
   removeDisable() {
     this.getElement().querySelectorAll(`input`)
       .forEach((input) => input.removeAttribute(`disabled`));
+    this.getElement().querySelectorAll(`button`)
+      .forEach((btn) => btn.removeAttribute(`disabled`));
   }
 
   setSubmitHandler(handler) {
@@ -284,8 +294,8 @@ export default class NewEvent extends AbstractSmartComponent {
     this._closeButtonClickHandler = handler;
   }
 
-  setFlatpickr(dateElement, eventDate) {
-    this._flatpickr = flatpickr(dateElement, {
+  _makeFlatpickrElement(eventDate) {
+    return {
       altInput: true,
       allowInput: true,
       enableTime: true,
@@ -293,13 +303,26 @@ export default class NewEvent extends AbstractSmartComponent {
       dateFormat: `d/m/Y H:i`,
       altFormat: `d/m/Y H:i`,
       defaultDate: eventDate,
-    });
+    };
+  }
+
+  setFlatpickr(dateElement, eventDate) {
+    if (dateElement.id.match(/(start)/g)) {
+      this._flatpickrStartTime = flatpickr(dateElement, this._makeFlatpickrElement(eventDate));
+    } else {
+      this._flatpickrEndTime = flatpickr(dateElement, this._makeFlatpickrElement(eventDate));
+    }
+
   }
 
   _applyFlatpickr() {
-    if (this._flatpickr) {
-      this._flatpickr.destroy();
-      this._flatpickr = null;
+    if (this._flatpickrStartTime) {
+      this._flatpickrStartTime.destroy();
+      this._flatpickrStartTime = null;
+    }
+    if (this._flatpickrEndTime) {
+      this._flatpickrEndTime.destroy();
+      this._flatpickrEndTime = null;
     }
 
     const dateStartElement = this.getElement().querySelector(`#event-start-time-1`);
@@ -364,6 +387,22 @@ export default class NewEvent extends AbstractSmartComponent {
       eventOffersList.addEventListener(`change`, (evt) => {
         const offer = element.querySelector(`#event-offer-${evt.target.value}-1`);
         offer.toggleAttribute(`checked`);
+
+        const checkedOffers = Array.from(eventOffersList.querySelectorAll(`input`)).map((currentOffer) => {
+          if (currentOffer.hasAttribute(`checked`)) {
+            return currentOffer.value;
+          } else {
+            return null;
+          }
+        });
+
+        this._eventOffers = this._eventOffers.map((currentOffer) => {
+          if (checkedOffers.includes(currentOffer.id)) {
+            return Object.assign({}, currentOffer, {required: true});
+          } else {
+            return Object.assign({}, currentOffer, {required: false});
+          }
+        });
       });
     }
   }
