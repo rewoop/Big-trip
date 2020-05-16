@@ -71,6 +71,7 @@ export default class Sort extends AbstractSmartComponent {
 
   setSortTypeChangeHandler(handler) {
     const sortFilters = this.getElement().querySelectorAll(`input`);
+    this._setSortTypeChangeHandler = handler;
 
     sortFilters.forEach((filter) => {
       filter.addEventListener(`click`, (evt) => {
@@ -79,8 +80,7 @@ export default class Sort extends AbstractSmartComponent {
           return;
         }
         this._currenSortType = sortType;
-        this._setSortTypeChangeHandler = handler;
-        setTimeout(handler(this._currenSortType), 2000);
+        handler(this._currenSortType);
       });
     });
   }

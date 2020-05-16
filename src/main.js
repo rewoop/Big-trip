@@ -81,6 +81,7 @@ siteMenu.setOnTripTabsChange((menuItem) => {
       break;
     case MenuItem.STATISTICS:
       setCurrentView(MenuItem.STATISTICS, tripController, statisticsComponent);
+      filterController.removeChecked();
       newEventButton.setAttribute(`disabled`, `disabled`);
       break;
   }
