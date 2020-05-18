@@ -10,8 +10,8 @@ import {encode} from "he";
 import "flatpickr/dist/flatpickr.min.css";
 
 const createNewEventTemplate = (newEvent, options = {}) => {
-  const {time, price: notSanitizedPrice, isFavorite} = newEvent;
-  const {type, offers, destination, mode, destinations, externalData} = options;
+  const {isFavorite} = newEvent;
+  const {type, offers, destination, mode, destinations, externalData, price: notSanitizedPrice, time} = options;
   const {description, photos, currentCity: notSanitizedCurrentCity} = destination;
   const {eventStartTime, eventEndTime} = time;
 
@@ -184,10 +184,10 @@ export default class NewEvent extends AbstractSmartComponent {
     this._eventDestination = Object.assign({}, event.destination);
     this._eventStartDate = event.time.eventStartTime;
     this._eventEndDate = event.time.eventEndTime;
+    this._eventPrice = event.price;
     this._externalData = DefaultData;
     this._submitHandler = null;
     this._favoriteBtnHandler = null;
-    this._flatpickr = null;
     this._flatpickrStartTime = null;
     this._flatpickrEndTime = null;
     this._deleteButtonClickHandler = null;
@@ -204,7 +204,12 @@ export default class NewEvent extends AbstractSmartComponent {
       destination: this._eventDestination,
       mode: this._mode,
       destinations: this._destinations,
-      externalData: this._externalData
+      externalData: this._externalData,
+      price: this._eventPrice,
+      time: {
+        eventStartTime: this._eventStartDate,
+        eventEndTime: this._eventEndDate
+      }
     });
   }
 
@@ -238,6 +243,10 @@ export default class NewEvent extends AbstractSmartComponent {
   getData() {
     const form = this.getElement().querySelector(`form`);
     return new FormData(form);
+  }
+
+  getCurrentMode() {
+    return this._mode;
   }
 
   setData(data) {
@@ -326,9 +335,9 @@ export default class NewEvent extends AbstractSmartComponent {
     }
 
     const dateStartElement = this.getElement().querySelector(`#event-start-time-1`);
-    this.setFlatpickr(dateStartElement, this._event.time.eventStartTime);
+    this.setFlatpickr(dateStartElement, this._eventStartDate);
     const dateEndElement = this.getElement().querySelector(`#event-end-time-1`);
-    this.setFlatpickr(dateEndElement, this._event.time.eventEndTime);
+    this.setFlatpickr(dateEndElement, this._eventEndDate);
   }
 
   _subscribeOnEvents() {
@@ -337,9 +346,14 @@ export default class NewEvent extends AbstractSmartComponent {
     const eventTypeList = element.querySelector(`.event__type-list`);
     const eventDestination = element.querySelector(`#event-destination-1`);
     const eventOffersList = element.querySelector(`.event__available-offers`);
+    const eventPrice = element.querySelector(`.event__input--price`);
     const startTime = element.querySelector(`#event-start-time-1`);
     const endTime = element.querySelector(`#event-end-time-1`);
     const validityEndTimeInput = element.querySelectorAll(`.event__input--time`)[3];
+
+    eventPrice.addEventListener(`input`, (evt) => {
+      this._eventPrice = evt.target.value;
+    });
 
     startTime.addEventListener(`change`, (evt) => {
       this._eventStartDate = formatDateToDefault(evt.target.value);

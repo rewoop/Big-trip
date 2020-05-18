@@ -1,7 +1,7 @@
 import TripEvents from "../components/trip-events";
 import NewEvent from "../components/new-event";
 import {replace, remove} from "../utils/render";
-import {formatDateToDefault, formatString, parseDestinationInfo} from "../utils/common";
+import {formatDateToDefault, formatString, parseDestinationInfo, removeComponent} from "../utils/common";
 import Point from "../models/point";
 import {SHAKE_ANIMATION_TIMEOUT, Mode} from "../const";
 
@@ -103,6 +103,7 @@ export default class PointController {
     this._eventEditComponent.setCloseButtonClickHandler(() => {
       if (this._mode === Mode.ADDING) {
         this._onDataChange(this, event, null, false, this._button);
+        return;
       }
       this._replaceEditToEvent();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
@@ -198,6 +199,10 @@ export default class PointController {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
     this._eventEditComponent.rerender();
     if (document.contains(this._eventEditComponent.getElement())) {
+      if (this._eventEditComponent.getCurrentMode() === Mode.ADDING) {
+        removeComponent(this._eventEditComponent);
+        return;
+      }
       replace(this._currentEvent, this._eventEditComponent);
     }
     this._mode = Mode.DEFAULT;

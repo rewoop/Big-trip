@@ -1,11 +1,11 @@
-import {MAX_SHOWING_OFFERS, monthMap} from "../const";
+import {MAX_SHOWING_OFFERS, monthMap, DEFAULT_RADIX} from "../const";
 
 const getSummOffers = (offers) => {
   return offers.length > 0 ? offers
     .map((offer) => {
       return {
         required: offer.required === undefined ? false : offer.required,
-        price: parseInt(offer.price, 10)
+        price: parseInt(offer.price, DEFAULT_RADIX)
       };
     })
     .map((offer) => {
@@ -42,7 +42,7 @@ const getRoute = (points) => {
 
   let route = Array.from(cities);
 
-  if (route <= MAX_SHOWING_OFFERS) {
+  if (route.length <= MAX_SHOWING_OFFERS) {
     route = route
       .map((city) => `${city}`)
       .join(` — `);

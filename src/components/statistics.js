@@ -2,7 +2,7 @@ import AbstractSmartComponent from "./abstract-smart-component";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {getDurationDate} from "../utils/common";
-import {iconMap, BAR_HEIGHT, MIN_BAR_LENGTH, BAR_THICKNESS, DATALABELS_SIZE, TITLE_FONT_SIZE, TICKS_PADDING, TICKS_FONT_SIZE} from "../const";
+import {iconMap, BAR_HEIGHT, MIN_BAR_LENGTH, BAR_THICKNESS, DATALABELS_SIZE, TITLE_FONT_SIZE, TICKS_PADDING, TICKS_FONT_SIZE, MONEY_TIME_SPENT_CHART_FACTOR, TRANSPORT_CHART_FACTOR} from "../const";
 
 const getUniqItems = (item, index, array) => {
   return array.indexOf(item) === index;
@@ -320,9 +320,9 @@ export default class Statistics extends AbstractSmartComponent {
     const transportCtx = element.querySelector(`.statistics__chart--transport`);
     const timeSpentCtx = element.querySelector(`.statistics__chart--time`);
 
-    moneyCtx.height = BAR_HEIGHT * 7;
-    transportCtx.height = BAR_HEIGHT * 5;
-    timeSpentCtx.height = BAR_HEIGHT * 7;
+    moneyCtx.height = BAR_HEIGHT * MONEY_TIME_SPENT_CHART_FACTOR;
+    transportCtx.height = BAR_HEIGHT * TRANSPORT_CHART_FACTOR;
+    timeSpentCtx.height = BAR_HEIGHT * MONEY_TIME_SPENT_CHART_FACTOR;
 
     this._resetCharts();
 
